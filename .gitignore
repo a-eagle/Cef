@@ -11,7 +11,7 @@
 !/vs2010/cefsimple/
 /vs2010/cefsimple/*
 !/vs2010/cefsimple/Release/
-/vs2010/cefsimple/Release/easyui/
+/vs2010/cefsimple/Release/ui/easyui/
 
 *.log
 *.lnk
