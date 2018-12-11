@@ -47,6 +47,10 @@ bool GetCallInfo(const char *funcDesc, int *paramNum, CallType *params, CallType
 	if (*p++ != '(') {
 		return false;
 	}
+	if (*p == ')') {
+		*paramNum = 0;
+		return true;
+	}
 	while (*p) {
 		t = GetCallType(*p++);
 		CHECK_TYPE(t);

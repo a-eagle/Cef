@@ -11,8 +11,9 @@
 
 <script type='text/javascript' >
 	$(function() {
-		var id  = callNative('MessageBoxA', 'i(p, s, s, i)', [0, "My Text 你好呀", "My Caption AA", 1]);
-		alert('you press ' + id);
+		var wnd = callNative('GetForegroundWindow', 'p()');
+		var id  = callNative('MessageBoxA', 'i(p, s, s, i)', [wnd, "My Text 你好呀", "My Caption AA", 1]);
+		// alert('you press ' + id);
 	});
 </script>
 
