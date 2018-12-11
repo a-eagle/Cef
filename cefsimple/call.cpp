@@ -1,21 +1,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <stdio.h>
-
-enum CallType {
-	CALL_TYPE_UNDEFIND = -1,
-	CALL_TYPE_VOID =    0,        // v
-	CALL_TYPE_CHAR =    (1 << 0), // c
-	CALL_TYPE_INT =     (1 << 1), // i
-	CALL_TYPE_POINTER = (1 << 2), // p
-	CALL_TYPE_STRING =  (1 << 3), // s
-	CALL_TYPE_WSTRING = (1 << 4), // w
-
-	CALL_TYPE_DOUBLE =  (1 << 5), // d
-	CALL_TYPE_FLOAT =   (1 << 6), // f
-
-	CALL_TYPE_ARRAY =   (1 << 8)  // [
-};
+#include "call.h"
 
 static CallType GetCallType(char c) {
 	switch (c) {
@@ -34,7 +20,7 @@ static CallType GetCallType(char c) {
 
 #define  CHECK_TYPE(t) if (t == CALL_TYPE_UNDEFIND) {return false;}
 
-static bool GetDescInfo(const char *funcDesc, int *paramNum, CallType *params, CallType *ret) {
+bool GetCallInfo(const char *funcDesc, int *paramNum, CallType *params, CallType *ret) {
 	char tmp[64] = {0};
 	char *p = tmp;
 	while (*funcDesc != 0) {
@@ -86,7 +72,7 @@ static bool GetDescInfo(const char *funcDesc, int *paramNum, CallType *params, C
 	return true;
 }
 
-bool Call(const char *funcName, const char *funcDesc, void **params, int *ret) {
+bool Call(const char *funcName, const char *funcDesc, void **params, int paramsCount, int *ret) {
 	static HMODULE kernalModule = GetModuleHandleA("kernel32.dll");
 	static HMODULE userModule = GetModuleHandleA("user32.dll");
 
@@ -99,7 +85,11 @@ bool Call(const char *funcName, const char *funcDesc, void **params, int *ret) {
 	CallType paramsInfo[10];
 	CallType retInfo;
 
-	if (! GetDescInfo(funcDesc, &paramNum, paramsInfo, &retInfo)) {
+	if (! GetCallInfo(funcDesc, &paramNum, paramsInfo, &retInfo)) {
+		return false;
+	}
+
+	if (paramNum != paramsCount) {
 		return false;
 	}
 
@@ -113,11 +103,22 @@ bool Call(const char *funcName, const char *funcDesc, void **params, int *ret) {
 
 	// push params
 	int v = 0;
+	float vf = 0;
+	double vd = 0;
 	for (int i = paramNum - 1; i >= 0; --i) {
 		if (paramsInfo[i] <= CALL_TYPE_WSTRING) {
 			v = (int)params[i];
 			__asm push v
+		} 
+#if 0
+		else if (paramsInfo[i] == CALL_TYPE_FLOAT) {
+			vf = *(float *)params[i];
+			__asm push vf
+		} else if (paramsInfo[i] == CALL_TYPE_DOUBLE) {
+			vd = *(double *)params[i];
+			__asm push vd
 		}
+#endif
 	}
 	__asm call addr;
 	__asm mov rr, eax
@@ -128,10 +129,10 @@ bool Call(const char *funcName, const char *funcDesc, void **params, int *ret) {
 	return true;
 }
 
-int main(int argc, char* argv[]) {
+int test_main(int argc, char* argv[]) {
 	int rr = -1;
 	void *params[] = {NULL, "My Text AA", "My Caption AA", (void *)1};
-	bool r = Call("MessageBoxA", "i(p, s, s, i)", params, &rr);
+	bool r = Call("MessageBoxA", "i(p, s, s, i)", params, 4, &rr);
 
 	printf("r = %d, rr = %d \n", r, rr);
 	// MessageBoxA(NULL, "My Text", "My Title", MB_OK);
