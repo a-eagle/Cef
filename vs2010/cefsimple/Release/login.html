@@ -1,0 +1,39 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="my/my.css" > 
+<link rel="stylesheet" type="text/css" href="easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+
+<script type="text/javascript" src="my/my.js"></script>
+<script type="text/javascript" src="easyui/jquery.min.js"></script>
+<script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+
+<script type='text/javascript' >
+	function checkLogin() {
+		var name = $('input[name="name"]').val();
+		var pwd = $('input[name="pwd"]').val();
+		if (name == 'admin' && pwd == '123456') {
+			window.location.href = 'file:///main.html';
+		} else {
+			$.messager.alert('Error','User name or password is error!');
+		}
+	}
+</script>
+
+</head>
+
+<body>
+
+	<div class="easyui-panel" title="User Login" style="width:400px;height:250px;padding:10px;">
+		<p> User Name: <input class="easyui-textbox" name="name" style="width:60%;height:32px"> </p>
+		<p> Password:&nbsp;&nbsp; <input class="easyui-textbox" type='password' name="pwd" style="width:60%;height:32px"> </p>
+		
+		<p style="padding:20 20 20 100;">
+			<label onclick="checkLogin()" class="easyui-linkbutton" iconCls="icon-ok" style="width:60%;height:32px">Login</label> 
+		</p>
+	</div>
+
+</body>
+
+</html>
