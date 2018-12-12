@@ -142,6 +142,38 @@ var Tab = {
 	}
 };
 
+var Request = {
+	_params : {},
+	_hasInit : false,
+	_init : function() {
+		if (this._hasInit) return;
+		this._hasInit = true;
+		var url = window.location.href;
+		var idx = url.indexOf('?');
+		if (idx < 0) return;
+		var str = url.substring(idx + 1);
+		if (! str) return;
+		var list = str.split('&');
+		for (var i = 0; i < list.length; ++i) {
+			if (! list[i]) continue;
+			var kv = list[i].split('=');
+			if (kv.length == 2 && kv[0]) {
+				this._params[kv[0]] = kv[1];
+			}
+		}
+	},
+	
+	getParam : function (paramName) {
+		this._init();
+		return this._params[paramName];
+	},
+	
+	getParams : function() {
+		this._init();
+		return this._params;
+	}
+};
+
 
 
 
