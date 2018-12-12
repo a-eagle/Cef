@@ -124,7 +124,7 @@ bool Call(const char *funcName, const char *funcDesc, void **params, int paramsC
 		}
 #endif
 	}
-	__asm call addr;
+	__asm call addr
 	__asm mov rr, eax
 	if (ret != NULL && retInfo != CALL_TYPE_VOID) {
 		*ret = rr;

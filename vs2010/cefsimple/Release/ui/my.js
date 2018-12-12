@@ -110,6 +110,38 @@ var ComboBox = {
 	}
 };
 
+var Tab = {
+	/**
+	* @param tabObj An tab's jquery obj.  Eg: $('#xx_tab')
+	* @param title  An tab item title
+	* @param url An tab item url
+	* @param tabId Unique tab item id. If not given, same as url
+	*     Eg: openTab(, 'My Title', 'abc.html')
+	*/
+	openTab: function (tabObj, title, url, tabId) {
+		var opts = tabObj.tabs('tabs');
+		var len = opts.length;
+		if (!tabId) {
+			tabId = url;
+		}
+		for (var i = 0; i < len; ++i) {
+			var item = tabObj.tabs('getTab', i);
+			if (item._tabId == tabId) {
+				tabObj.tabs('select', i);
+				return;
+			}
+		}
+		tabObj.tabs('add',{
+			title: title,
+			closable: true,
+			fit:true, border:true,
+			content:'<iframe frameborder="0" width="100%" height="100%" scrolling="auto" src="' + url + '" />'
+		});
+		var item = tabObj.tabs('getTab', title);
+		item._tabId = tabId;
+	}
+};
+
 
 
 

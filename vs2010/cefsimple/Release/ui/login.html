@@ -19,13 +19,28 @@
 			$.messager.alert('Error','User name or password is error!');
 		}
 	}
+	
+	function moveCenter() {
+		var opts = $('#center').panel('options');
+		var x = ($(document.body).width() - opts.width) / 2;
+		var y = ($(document.body).height() - opts.height) / 2;
+		
+		//要使move生效， 必须设置 data-options="style:{position:'absolute'}"
+		$('#center').panel('move', {left:x, top:y});
+	}
+	// window.onresize = moveCenter;
+	$(window).bind('resize', moveCenter);
+	$(function() {
+		document.title = 'Login';
+		moveCenter();
+	});
 </script>
 
 </head>
 
 <body>
-
-	<div class="easyui-panel" title="User Login" style="width:400px;height:250px;padding:10px;">
+	
+	<div class="easyui-panel" id = "center" title="User Login" style="width:400px;height:250px;padding:10px;" data-options="style:{position:'absolute'}">
 		<p> User Name: <input class="easyui-textbox" name="name" style="width:60%;height:32px"> </p>
 		<p> Password:&nbsp;&nbsp; <input class="easyui-textbox" type='password' name="pwd" style="width:60%;height:32px"> </p>
 		
@@ -33,7 +48,7 @@
 			<label onclick="checkLogin()" class="easyui-linkbutton" iconCls="icon-ok" style="width:60%;height:32px">Login</label> 
 		</p>
 	</div>
-
+	
 </body>
 
 </html>
