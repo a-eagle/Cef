@@ -118,6 +118,7 @@ ClientAppRenderer::ClientAppRenderer() {
 
 void ClientAppRenderer::OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context )
 {
+	printf("ClientAppRenderer.OnContextCreated() \n");
 	// Retrieve the context's window object.
 	CefRefPtr<CefV8Value> object = context->GetGlobal();
 
@@ -131,10 +132,15 @@ void ClientAppRenderer::OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefP
 
 	CefRefPtr<CefV8Value> func3 = CefV8Value::CreateFunction("createBuffer", m_v8Handler);
 	object->SetValue("createBuffer", func3, V8_PROPERTY_ATTRIBUTE_NONE);
+
+	static CefRefPtr<CefV8Value> app = CefV8Value::CreateObject(NULL);
+	object->SetValue("App", app, V8_PROPERTY_ATTRIBUTE_NONE);
+
 }
 
 void ClientAppRenderer::OnWebKitInitialized()
 {
+	printf("ClientAppRenderer.OnWebKitInitialized() \n");
 #if 0
 	std::string file_code = 
 		"function File(path) {"
