@@ -129,8 +129,8 @@ void ClientAppRenderer::OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefP
 	CefRefPtr<CefV8Value> func2 = CefV8Value::CreateFunction("callNative", m_v8Handler);
 	object->SetValue("callNative", func2, V8_PROPERTY_ATTRIBUTE_NONE);
 
-	CefRefPtr<CefV8Value> func3 = CefV8Value::CreateFunction("openFile", m_v8Handler);
-	object->SetValue("openFile", func3, V8_PROPERTY_ATTRIBUTE_NONE);
+	CefRefPtr<CefV8Value> func3 = CefV8Value::CreateFunction("createBuffer", m_v8Handler);
+	object->SetValue("createBuffer", func3, V8_PROPERTY_ATTRIBUTE_NONE);
 }
 
 void ClientAppRenderer::OnWebKitInitialized()

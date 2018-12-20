@@ -149,6 +149,7 @@ public:
 			char *sc = (char *)XString::toBytes((void *)s, XString::UNICODE2, XString::GBK);
 			int c = rs->findColumn(sc);
 			retval = CefV8Value::CreateInt(c);
+			if (sc) free(sc);
 			return true;
 		}
 		if (name == "getBlob") {
@@ -435,6 +436,7 @@ public:
 			char *c = s_con->getError();
 			wchar_t *wc = (wchar_t *)XString::toBytes((void *)c, XString::GBK, XString::UNICODE2);
 			retval = CefV8Value::CreateString(CefString(wc));
+			if (wc != NULL) free(wc);
 			return true;
 		}
 		if (name == "executeQuery" && arguments.size() == 1 && arguments[0]->IsString()) {
@@ -457,6 +459,7 @@ public:
 			int num = s->executeUpdate(sqlc);
 			retval = CefV8Value::CreateInt(num);
 			s->close();
+			if (sqlc != NULL) free(sqlc);
 			return true;
 		}
 		if (name == "prepare" && arguments.size() == 1 && arguments[0]->IsString()) {
