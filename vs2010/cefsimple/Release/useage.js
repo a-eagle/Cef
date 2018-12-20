@@ -1,3 +1,4 @@
+ 参数： --disable-web-security 可以开启ajax加载本地文件
 
 Buffer createBuffer(int length);
 class Buffer {
