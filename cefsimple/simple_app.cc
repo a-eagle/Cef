@@ -14,6 +14,7 @@
 #include "include/wrapper/cef_helpers.h"
 
 #include "DB.h"
+#include "utils/XString.h"
 
 namespace {
 
@@ -88,7 +89,7 @@ void SimpleApp::OnContextInitialized() {
   if (url.empty()) {
 	  url = "file:///index.html";
   }
-
+  
   if (use_views) {
     // Create the BrowserView.
     CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView(
@@ -150,6 +151,33 @@ void ClientAppRenderer::OnWebKitInitialized()
 
 	CefRegisterExtension("v8/File", file_code, m_v8Handler);
 #endif
+}
+
+void ClientAppRenderer::OnUncaughtException( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context, CefRefPtr<CefV8Exception> exception, CefRefPtr<CefV8StackTrace> stackTrace )
+{
+	CefString urlw = frame->GetURL();
+	CefString msgw = exception->GetMessage();
+	CefString srcw = exception->GetSourceLine();
+	char *url = XString::unicodeToGbk(urlw.c_str());
+	char *msg = XString::unicodeToGbk(msgw.c_str());
+	char *src = XString::unicodeToGbk(srcw.c_str());
+
+	printf("%s\n", msg);
+	for (int i = 0; i < stackTrace->GetFrameCount() && i < 5; ++i) {
+		CefRefPtr<CefV8StackFrame> f = stackTrace->GetFrame(i);
+		CefString funcw = f->GetFunctionName();
+		CefString scriptw = f->GetScriptName();
+		char *func = XString::unicodeToGbk(funcw.c_str());
+		char *script = XString::unicodeToGbk(scriptw.c_str());
+		printf("   at %s ", func);
+		printf("(%s:%d)  \n", script, f->GetLineNumber());
+		free(func);
+		free(script);
+	}
+	
+	free(url);
+	free(msg);
+	free(src);
 }
 
 

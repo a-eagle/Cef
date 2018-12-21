@@ -12,7 +12,8 @@
 class SimpleHandler : public CefClient,
                       public CefDisplayHandler,
                       public CefLifeSpanHandler,
-                      public CefLoadHandler {
+                      public CefLoadHandler,
+					  public CefContextMenuHandler {
  public:
   explicit SimpleHandler(bool use_views);
   ~SimpleHandler();
@@ -30,6 +31,21 @@ class SimpleHandler : public CefClient,
   virtual CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE {
     return this;
   }
+
+  virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() {
+	  return this;
+  }
+
+  // CefContextMenuHandler methods
+  void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+	  CefRefPtr<CefFrame> frame,
+	  CefRefPtr<CefContextMenuParams> params,
+	  CefRefPtr<CefMenuModel> model) OVERRIDE;
+  bool OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
+	  CefRefPtr<CefFrame> frame,
+	  CefRefPtr<CefContextMenuParams> params,
+	  int command_id,
+	  EventFlags event_flags) OVERRIDE;
 
   // CefDisplayHandler methods:
   virtual void OnTitleChange(CefRefPtr<CefBrowser> browser,

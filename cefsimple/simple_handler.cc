@@ -131,3 +131,33 @@ void SimpleHandler::CloseAllBrowsers(bool force_close) {
   for (; it != browser_list_.end(); ++it)
     (*it)->GetHost()->CloseBrowser(force_close);
 }
+
+void SimpleHandler::OnBeforeContextMenu( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model )
+{
+	const int SHOW_TOOLS_ID = 26505;
+	model->AddItem(SHOW_TOOLS_ID, "Show DevTools");
+}
+
+class DevToolsClient : public CefClient {
+public:
+	IMPLEMENT_REFCOUNTING(DevToolsClient);
+};
+
+bool SimpleHandler::OnContextMenuCommand( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, int command_id, EventFlags event_flags )
+{
+	const int SHOW_TOOLS_ID = 26505;
+
+	if (command_id == SHOW_TOOLS_ID) {
+		CefWindowInfo windowInfo;
+		CefRefPtr<CefClient> client = new DevToolsClient(); // 必须要有一个client，否则无法显示
+		CefBrowserSettings settings;
+		CefPoint inspect_element_at;
+
+		windowInfo.SetAsPopup(NULL, "MY-DevTools");
+		browser->GetHost()->ShowDevTools(windowInfo, client, settings,
+			inspect_element_at);
+		return true;
+	}
+	// by default handling
+	return false;
+}

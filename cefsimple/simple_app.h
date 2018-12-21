@@ -43,6 +43,12 @@ public:
 
 	void OnWebKitInitialized() OVERRIDE;
 
+	virtual void OnUncaughtException(CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
+		CefRefPtr<CefV8Context> context,
+		CefRefPtr<CefV8Exception> exception,
+		CefRefPtr<CefV8StackTrace> stackTrace);
+
 private:
 	CefRefPtr<MyV8Handler> m_v8Handler;
 

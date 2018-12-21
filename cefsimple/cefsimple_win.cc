@@ -80,7 +80,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 #if !defined(CEF_USE_SANDBOX)
   settings.no_sandbox = true;
 #endif
-
+  settings.uncaught_exception_stack_size = 5;
   // Initialize CEF.
   CefInitialize(main_args, settings, app.get(), sandbox_info);
 
