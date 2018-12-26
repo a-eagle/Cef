@@ -34,6 +34,12 @@
 	$(function() {
 		document.title = 'Login';
 		moveCenter();
+		
+		$("input[type='password']").bind('keyup', function(evt) {
+			if (evt.keyCode == 13) {
+				$('.easyui-linkbutton').trigger('click');
+			}
+		});
 	});
 </script>
 
