@@ -89,10 +89,10 @@ ZRESULT ZipGetMemory(HZIP hz, void **buf, unsigned long *len);
 // buf will receive a pointer to its start, and len its length.
 // Note: you can't add any more after calling this.
 
-ZRESULT CloseZip(HZIP hz);
+// ZRESULT CloseZip(HZIP hz);
 // CloseZip - the zip handle must be closed with this function.
 
-unsigned int FormatZipMessage(ZRESULT code, TCHAR *buf,unsigned int len);
+// unsigned int FormatZipMessage(ZRESULT code, TCHAR *buf,unsigned int len);
 // FormatZipMessage - given an error code, formats it as a string.
 // It returns the length of the error message. If buf/len points
 // to a real buffer, then it also writes as much as possible into there.

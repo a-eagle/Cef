@@ -146,7 +146,7 @@ void ClientAppRenderer::OnWebKitInitialized()
 	printf("ClientAppRenderer.OnWebKitInitialized() \n");
 
 	
-	// RegisterZipCode();
+	RegisterZipCode();
 }
 
 void ClientAppRenderer::OnUncaughtException( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context, CefRefPtr<CefV8Exception> exception, CefRefPtr<CefV8StackTrace> stackTrace )
