@@ -61,6 +61,11 @@ class ResultSet {
 what? callNative(String funcName, String funcDesc, Array funcParams);
 
 
+class ZIP {
+	constructor(filePath); // build  file
+	// constructor(memorySize); // build  memory, not implement
+	
+}
 
 
 	

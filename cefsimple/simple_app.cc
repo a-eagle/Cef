@@ -139,18 +139,14 @@ void ClientAppRenderer::OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefP
 
 }
 
+extern void RegisterZipCode();
+
 void ClientAppRenderer::OnWebKitInitialized()
 {
 	printf("ClientAppRenderer.OnWebKitInitialized() \n");
-#if 0
-	std::string file_code = 
-		"function File(path) {"
-		"	native function CreateFileObj(path);"
-		"   return CreateFileObj(path);"
-		"}";
 
-	CefRegisterExtension("v8/File", file_code, m_v8Handler);
-#endif
+	
+	// RegisterZipCode();
 }
 
 void ClientAppRenderer::OnUncaughtException( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context, CefRefPtr<CefV8Exception> exception, CefRefPtr<CefV8StackTrace> stackTrace )
