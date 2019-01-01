@@ -90,7 +90,7 @@ bool ZipV8Handler::Execute( const CefString& name, CefRefPtr<CefV8Value> obj, co
 		}
 		return true;
 	}
-	if (name == "unzipItem") {
+	if (name == "ZIP_unzipItem") {
 		if (arguments.size() != 3) return false;
 		if (!arguments[1]->IsInt() || !arguments[2]->IsString()) {
 			return false;
