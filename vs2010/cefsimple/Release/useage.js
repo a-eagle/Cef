@@ -1,5 +1,6 @@
  参数： --disable-web-security 可以开启ajax加载本地文件
-
+ 注：html 里必须要指明charset <meta charset="UTF-8">   默认Cef用GBK加载
+ 
 Buffer createBuffer(int length);
 class Buffer {
 	int length();
@@ -72,6 +73,17 @@ class ZIP {
 	int getItemCount();
 	Object findItem(itemName);  // Object = {index: 2, name:'abc/tt.xml', compressSize:1200, unCompressSize:3000}
 	boolean unzipItem(idx, destFilePath);
+}
+
+class FILE {
+	constructor(path);
+	String getName();
+	boolean exists();
+	boolean isDirectory();
+	int length();
+	Buffer read();
+	boolean write(String data or Buffer buf);
+	String[] list([pattern]); // pattern 匹配模式  如：*.txt
 }
 
 

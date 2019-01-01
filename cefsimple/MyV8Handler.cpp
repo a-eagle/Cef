@@ -12,7 +12,7 @@ static BufferV8Handler *s_bufferV8Handler;
 class Wrap : public CefBase {
 public:
 	Wrap(void *buf, int len) { mBuf = buf; mLen = len;}
-	
+
 	void *mBuf;
 	int mLen;
 
@@ -263,6 +263,10 @@ public:
 			retval = mFuncs[i];
 			return true;
 		}
+		if (name == "__TYPE") {
+			retval = CefV8Value::CreateString("NativeBuffer");
+			return true;
+		}
 		return false;
 	}
 
@@ -279,7 +283,7 @@ public:
 };
 
 
-static CefRefPtr<CefV8Value> WrapBuffer(void *buf, int len) {
+CefRefPtr<CefV8Value> WrapBuffer(void *buf, int len) {
 	static CefRefPtr<CefV8Accessor> accessor =  new BufferV8Accessor();
 	if (s_bufferV8Handler == NULL) {
 		s_bufferV8Handler = new BufferV8Handler();
@@ -288,9 +292,30 @@ static CefRefPtr<CefV8Value> WrapBuffer(void *buf, int len) {
 	for (int i = 0; i < sizeof(BufferV8Accessor_sNames)/sizeof(const char *); ++i ) {
 		obj->SetValue(BufferV8Accessor_sNames[i], V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
 	}
+	obj->SetValue("__TYPE", V8_ACCESS_CONTROL_ALL_CAN_READ, V8_PROPERTY_ATTRIBUTE_READONLY);
 	CefRefPtr<Wrap> ptr = new Wrap(buf, len);
 	obj->SetUserData(ptr);
 	return obj;
+}
+
+bool IsNativeBuffer(CefRefPtr<CefV8Value> buf) {
+	if (buf == NULL) return false;
+	CefRefPtr<CefBase> ud = buf->GetUserData();
+	CefRefPtr<CefV8Value> typ = buf->GetValue("__TYPE");
+	if (typ == NULL) return false;
+	CefString t = typ->GetStringValue();
+	return t == "NativeBuffer";
+}
+
+void *GetNativeBufer(CefRefPtr<CefV8Value> buf, int *len) {
+	CefRefPtr<CefBase> ud = buf->GetUserData();
+	*len = 0;
+	if (! IsNativeBuffer(buf)) {
+		return NULL;
+	}
+	Wrap *wd = static_cast<Wrap*>(ud.get());
+	*len = wd->mLen;
+	return wd->mBuf;
 }
 
 MyV8Handler::MyV8Handler()

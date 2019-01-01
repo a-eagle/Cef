@@ -54,6 +54,7 @@ bool ZipV8Handler::Execute( const CefString& name, CefRefPtr<CefV8Value> obj, co
 		CefString m = modeV->GetStringValue();
 		ZRESULT z = 0;
 		HZIP hz = (HZIP)nativeOjbV->GetIntValue();
+
 		if (m == "CREATE") z = CloseZipZ(hz);
 		else if (m == "OPEN") z = CloseZipU(hz);
 		retval = CefV8Value::CreateBool(z == 0);
@@ -124,11 +125,11 @@ void RegisterZipCode() {
 		"};"
 		"ZIP.prototype.close = function() {"
 		"	native function ZIP_close();"
-		"	return ZIP_close(this._nativeObj);"
+		"	return ZIP_close(this);"
 		"};"
 		"ZIP.prototype.add = function(itemName, filePath) {"
 		"	native function ZIP_add();"
-		"	return ZIP_add(this._nativeObj, itemName, filePath);"
+		"	return ZIP_add(this, itemName, filePath);"
 		"};"
 		"ZIP.prototype.getItem = function(idx) {"
 		"	native function ZIP_getItem();"

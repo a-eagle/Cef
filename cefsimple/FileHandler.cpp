@@ -1,202 +1,171 @@
-#include "FileHandler.h"
-#include "utils/File.h"
+#include "include/cef_v8.h"
+#include <string>
+#include <windows.h>
+#include <stdlib.h>
+#include <vector>
+#include "utils/XString.h"
 
-class FileV8Handler;
-static FileV8Handler *s_v8Handler;
-
-class Wrap : public CefBase {
-public:
-	Wrap(File *f) { mFile = f;}
-
-	File *mFile;
-	IMPLEMENT_REFCOUNTING(Wrap);
-};
+extern CefRefPtr<CefV8Value> WrapBuffer(void *buf, int len);
+extern void *GetNativeBufer(CefRefPtr<CefV8Value> buf, int *len);
+extern bool IsNativeBuffer(CefRefPtr<CefV8Value> buf);
 
 class FileV8Handler : public CefV8Handler {
 public:
+	FileV8Handler() {}
+
 	virtual bool Execute(const CefString& name,
 		CefRefPtr<CefV8Value> object,
 		const CefV8ValueList& arguments,
 		CefRefPtr<CefV8Value>& retval,
-		CefString& exception) OVERRIDE {
+		CefString& exception) OVERRIDE;
 
-		CefRefPtr<CefBase> data = object->GetUserData();
-		Wrap *wd = (Wrap *)data.get();
-		File *file = wd->mFile;
 
-		if (name == "getName") {
-			XString n = file->getName();
-			wchar_t *ws = XString::gbkToUnicode(n.str());
-			retval = CefV8Value::CreateString(CefString(ws));
-			free(ws);
-			return true;
-		}
-		if (name == "getParent") {
-			XString n = file->getParent();
-			wchar_t *ws = XString::gbkToUnicode(n.str());
-			retval = CefV8Value::CreateString(CefString(ws));
-			free(ws);
-			return true;
-		}
-		if (name == "getParentFile") {
-			XString pf = file->getParent();
-			if (pf.length() == 0) {
-				return false;
-			}
-			wchar_t *ws = XString::gbkToUnicode(pf.str());
-			bool b = WrapOpenFile(retval, CefString(ws));
-			free(ws);
-			return b;
-		}
-		if (name == "getPath") {
-			XString n = file->getPath();
-			wchar_t *ws = XString::gbkToUnicode(n.str());
-			retval = CefV8Value::CreateString(CefString(ws));
-			free(ws);
-			return true;
-		}
-		if (name == "isAbsolute") {
-			bool b = file->isAbsolute();
-			retval = CefV8Value::CreateBool(b);
-			return true;
-		}
-		if (name == "getAbsolutePath") {
-			XString n = file->getAbsolutePath();
-			wchar_t *ws = XString::gbkToUnicode(n.str());
-			retval = CefV8Value::CreateString(CefString(ws));
-			free(ws);
-			return true;
-		}
-		if (name == "exists") {
-			bool b = file->exists();
-			retval = CefV8Value::CreateBool(b);
-			return true;
-		}
-		if (name == "isDirectory") {
-			bool b = file->isDirectory();
-			retval = CefV8Value::CreateBool(b);
-			return true;
-		}
-		if (name == "isFile") {
-			bool b = file->isFile();
-			retval = CefV8Value::CreateBool(b);
-			return true;
-		}
-		if (name == "length") {
-			int b = file->length();
-			retval = CefV8Value::CreateInt(b);
-			return true;
-		}
-		if (name == "del") {
-			bool b = file->del();
-			retval = CefV8Value::CreateBool(b);
-			return true;
-		}
-		if (name == "mkdir") {
-			bool b = file->mkdir();
-			retval = CefV8Value::CreateBool(b);
-			return true;
-		}
-		if (name == "mkdirs") {
-			bool b = file->mkdirs();
-			retval = CefV8Value::CreateBool(b);
-			return true;
-		}
-		if (name == "rename") {
-			if (arguments.size() != 1 && !arguments[0]->IsString()) {
-				retval = CefV8Value::CreateBool(false);
-				return false;
-			}
-			CefString s = arguments[0]->GetStringValue();
-			char *cs = XString::unicodeToGbk(s.c_str());
-			bool b = file->rename(cs);
-			free(cs);
-			retval = CefV8Value::CreateBool(b);
-			return true;
-		}
-		if (name == "list") {
-			int num = 0;
-			XString *ss = file->list(num);
-			retval = CefV8Value::CreateArray(num);
-			for (int i = 0; i < num; ++i) {
-				char *v = ss[i].str();
-				wchar_t *wv = XString::gbkToUnicode(v);
-				retval->SetValue(i, CefV8Value::CreateString(CefString(wv)));
-				free(wv);
-			}
-			// if (ss != NULL) free(ss);
-			return true;
-		}
-		return false;
-	}
-
+	// Provide the reference counting implementation for this class.
 	IMPLEMENT_REFCOUNTING(FileV8Handler);
 };
 
-class FileV8Accessor : public CefV8Accessor {
-public:
-	FileV8Accessor() {
-	}
-	virtual bool Get(const CefString& name,
-		const CefRefPtr<CefV8Value> object,
-		CefRefPtr<CefV8Value>& retval,
-		CefString& exception) OVERRIDE {
-
-			if (name == "getName" || name == "getParent" || name == "getParentFile" || 
-				name == "getPath" || name == "isAbsolute" || name == "getAbsolutePath" || 
-				name == "exists" || name == "isDirectory" || name == "isFile" ||
-				name == "length" || name == "del" || name == "mkdir" || name == "mkdirs" || 
-				name == "rename" || name == "list") {
-
-					retval = CefV8Value::CreateFunction(name, CefRefPtr<CefV8Handler>(s_v8Handler));
-					return true;
-			}
-			return false;
-	}
-
-	virtual bool Set(const CefString& name,
-		const CefRefPtr<CefV8Value> object,
-		const CefRefPtr<CefV8Value> value,
-		CefString& exception) OVERRIDE {
-
-			// Value does not exist.
-			return false;
-	}
-
-	IMPLEMENT_REFCOUNTING(FileV8Accessor);
-};
-
-bool WrapOpenFile( CefRefPtr<CefV8Value>& retval, CefString path ) {
-	if (path.length() == 0) {
+bool FileV8Handler::Execute( const CefString& name, CefRefPtr<CefV8Value> obj, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception )
+{
+	CefRefPtr<CefV8Value> object = arguments[0];
+	CefRefPtr<CefV8Value> pathV = object->GetValue("_path");
+	if (pathV == NULL || pathV->IsNull() || !pathV->IsString()) {
 		return false;
 	}
-	if (s_v8Handler == NULL) {
-		s_v8Handler = new FileV8Handler();
-	}
-	const wchar_t *wp = path.c_str();
-	char *sp = (char *)XString::toBytes((void *)wp, XString::UNICODE2, XString::GBK);
-	File *file = new File(sp);
-	CefRefPtr<CefV8Accessor> accessor =  new FileV8Accessor();
-	free(sp);
+	CefString path = pathV->GetStringValue();
 
-	CefRefPtr<CefV8Value> obj = CefV8Value::CreateObject(accessor);
-	obj->SetValue("getName", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("getParent", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("getParentFile", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("getPath", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("isAbsolute", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("getAbsolutePath", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("exists", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("isDirectory", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("isFile", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("length", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("del", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("mkdir", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("mkdirs", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("rename", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	obj->SetValue("list", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
-	CefRefPtr<Wrap> ptr = new Wrap(file);
-	obj->SetUserData(ptr);
-	retval = obj;
-	return true;
+	if (name == "FILE_exists") {
+		WIN32_FIND_DATAW  fd;
+		HANDLE hd;
+		hd = FindFirstFileW(path.c_str(), &fd);
+		if (hd != INVALID_HANDLE_VALUE) FindClose(hd);
+		retval = CefV8Value::CreateBool(hd != INVALID_HANDLE_VALUE);
+		return true;
+	}
+	if (name == "FILE_isDirectory") {
+		WIN32_FIND_DATAW  fd;
+		HANDLE hd;
+		hd = FindFirstFileW(path.c_str(), &fd);
+
+		bool isd = false;
+		if (hd != INVALID_HANDLE_VALUE) {
+			isd = (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+			FindClose(hd);
+		}
+		retval = CefV8Value::CreateBool(isd);
+		return true;
+	}
+	if (name == "FILE_length") {
+		WIN32_FIND_DATAW  fd;
+		HANDLE hd;
+		hd = FindFirstFileW(path.c_str(), &fd);
+
+		int len = 0;
+		if (hd != INVALID_HANDLE_VALUE) {
+			if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+				len = fd.nFileSizeLow;
+			}
+			FindClose(hd);
+		}
+		retval = CefV8Value::CreateInt(len);
+		return true;
+	}
+	if (name == "FILE_read") {
+		HANDLE hd = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hd) return false;
+		DWORD dwSize = GetFileSize(hd, NULL);
+		char *buf = (char *)malloc(dwSize + 2);
+		DWORD rr = 0;
+		BOOL b = ReadFile(hd, buf, dwSize, &rr, NULL);
+		buf[rr] = buf[rr + 1] = 0;
+		CloseHandle(hd);
+		if (b) retval = WrapBuffer(buf, dwSize + 2);
+		return b;
+	}
+	if (name == "FILE_write") {
+		HANDLE hd = CreateFileW(path.c_str(), GENERIC_WRITE, 0, NULL, OPEN_ALWAYS|TRUNCATE_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hd) return false;
+		CefRefPtr<CefV8Value> data = arguments[1];
+		if (data == NULL) return false;
+		
+		bool b = false;
+		if (data->IsString()) {
+			CefString str = data->GetStringValue();
+			void *bdata = XString::toBytes((void *)str.c_str(), XString::UNICODE2, XString::UTF8);
+			if (bdata != NULL) {
+				int len = strlen((char *)bdata);
+				DWORD wlen = 0;
+				b = WriteFile(hd, bdata, len, &wlen, NULL);
+				free(bdata);
+			}
+		} else if (IsNativeBuffer(data)) {
+			// data is Buffer
+			int len = 0;
+			void *bdata = GetNativeBufer(data, &len);
+			if (bdata != NULL) {
+				DWORD wlen = 0;
+				b = WriteFile(hd, bdata, len, &wlen, NULL);
+			}
+		}
+		CloseHandle(hd);
+		return b;
+	}
+	if (name == "FILE_list") {
+		WIN32_FIND_DATAW  fd;
+		HANDLE hd;
+		WCHAR spath[MAX_PATH];
+		wcscpy(spath, path.c_str());
+		int slen = wcslen(spath);
+		if (slen >= 0) {
+			if (spath[slen] != '\\') wcscat(spath, L"\\");
+		}
+		bool add = false;
+		if (arguments.size() == 2) {
+			if (arguments[1] != NULL && arguments[1]->IsString()) {
+				CefString pa = arguments[1]->GetStringValue();
+				const WCHAR *wp = pa.c_str();
+				if (wp != NULL && pa.size() > 0) {
+					add = true;
+					wcscat(spath, wp);
+				}
+			}
+		}
+		if (!add) wcscat(spath, L"*");
+		hd = FindFirstFileW(spath, &fd);
+		if (hd != INVALID_HANDLE_VALUE) {
+			std::vector<CefRefPtr<CefV8Value> > vec;
+			do {
+				if (wcscmp(fd.cFileName, L".") == 0 || wcscmp(fd.cFileName, L"..") == 0) {
+					continue;
+				}
+				vec.push_back(CefV8Value::CreateString(fd.cFileName));
+			} while (FindNextFile(hd, &fd));
+
+			retval = CefV8Value::CreateArray(vec.size());
+			for (int i = 0; i < vec.size(); ++i) {
+				retval->SetValue(i, vec[i]);
+			}
+		}
+		FindClose(hd);
+		return true;
+	}
+
+
+	return false;
+}
+
+void RegisterFileCode() {
+	std::string zip_code = 
+		"function FILE(path) {"
+		"	this._path = path.replace('/', '\\\\');"
+		"};"
+		"FILE.prototype.getName = function() {var idx = this._path.lastIndexOf('\\\\'); if (idx < 0) return this._path; return this._path.substring(idx + 1);};"
+		"FILE.prototype.exists = function() {native function FILE_exists(); return FILE_exists(this);};"
+		"FILE.prototype.isDirectory = function() {native function FILE_isDirectory(); return FILE_isDirectory(this);};"
+		"FILE.prototype.length = function() {native function FILE_length(); return FILE_length(this);};"
+		"FILE.prototype.read = function() {native function FILE_read(); return FILE_read(this);};"
+		"FILE.prototype.write = function(data) {native function FILE_write();return FILE_write(this, data);};"
+		"FILE.prototype.list = function(pattern) {native function FILE_list();return FILE_list(this, pattern);};"
+		"\n";
+
+	CefRegisterExtension("v8/LocalFile", zip_code, new FileV8Handler());
 }

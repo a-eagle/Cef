@@ -29,8 +29,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
   UNREFERENCED_PARAMETER(hPrevInstance);
   UNREFERENCED_PARAMETER(lpCmdLine);
 
-  // AllocConsole();
-  // freopen("CONOUT$", "wb", stdout);
+#if 0
+  AllocConsole();
+  freopen("CONOUT$", "wb", stdout);
+#endif
 
   // Enable High-DPI support on Windows 7 or newer.
   CefEnableHighDPISupport();
