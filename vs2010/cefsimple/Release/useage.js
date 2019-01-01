@@ -52,7 +52,7 @@ class ResultSet {
 	int getInt(int idx);
 	int getInt64(int idx);
 	String getString(int idx);
-	bool next();
+	boolean next();
 	void close();
 	ResultSetMetaData getMetaData();
 }
@@ -62,9 +62,16 @@ what? callNative(String funcName, String funcDesc, Array funcParams);
 
 
 class ZIP {
-	constructor(filePath); // build  file
+	constructor(zipFilePath);
 	// constructor(memorySize); // build  memory, not implement
-	
+	boolean create();
+	boolean open();
+	boolean close();
+	boolean add(itemName, filePath);
+	Object getItem(int idx);  // Object = {index: 2, name:'abc/tt.xml', compressSize:1200, unCompressSize:3000}
+	int getItemCount();
+	Object findItem(itemName);  // Object = {index: 2, name:'abc/tt.xml', compressSize:1200, unCompressSize:3000}
+	boolean unzipItem(idx, destFilePath);
 }
 
 
