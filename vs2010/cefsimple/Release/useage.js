@@ -1,6 +1,7 @@
  参数： --disable-web-security 可以开启ajax加载本地文件
+        --single-process  单进程运行模型
  注：html 里必须要指明charset <meta charset="UTF-8">   默认Cef用GBK加载
- 
+
 Buffer createBuffer(int length);
 class Buffer {
 	int length();
