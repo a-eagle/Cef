@@ -6,6 +6,13 @@ function _readLocalXml(path) {
 	return docElem;
 }
 
+function _readLocalXml2(path) {
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.open("GET", path, false); // false: sync request
+	xmlhttp.send(null);
+	return {xml:xmlhttp.responseXML, txt:xmlhttp.responseText};
+}
+
 function _partNameToPath(basePath, partName) {
 	return basePath + '\\' + partName.replace(/[/]/g, '\\');
 }
@@ -73,16 +80,90 @@ function Workbook(zip, destPath) {
 		sheets[i].partName = rsh[sheets[i].rId];
 	}
 	this._sheets = sheets; // {name:'', partName:''}
-	console.log(sheets);
+	// console.log(sheets);
 }
 
-function Sheet(txt, docElem) {
+function Sheet(wb, txt, xml) {
+	this._workbook = wb;
 	this._txt = txt;
-	this._docElem = docElem;
+	this._xml = xml;
+	this._docElem = xml.documentElement;
+	this._cells = [];
+}
+Sheet.prototype._initSheetFormatPr = function(node) {
+	var a = node.getAttribute('defaultColWidth');
+	if (a) this._defColWidth = a;
+	a = node.getAttribute('defaultRowHeight');
+	if (a) this._defRowHeight = a;
+}
+Sheet.prototype._initCols = function(node) {
+	
 }
 
-Sheet.prototype._init = function() {
+// n = 'A23' return A is col 0
+function _getColIndex(n) {
+	for (var i = 0; i < n.length; ++i) {
+		if (n.charAt(i) >= '0' && n.charAt(i) <= '9') {
+			n = n.substring(0, i);
+			break;
+		}
+	}
+	var c = 0, jw = 1;
+	for (var i = n.length - 1; i >= 0; --i) {
+		c += (n.charCodeAt(i) - 65) * jw;
+		jw *= 26;
+	}
+	return c;
+}
+
+Sheet.prototype._initSheetData = function(node) {
+	var ss = this._workbook._strings;
+	var child = node.childNodes;
+	// console.log(node);
+	for (var i = 0; i < child.length; ++i) {
+		if (child[i].nodeType != 1) continue;
+		// child[i] is 'row' element
+		var r = child[i].getAttribute('r');
+		r = parseInt(r) - 1;
+		var row = [];
+		var cc = child[i].childNodes;
+		for (var j = 0; j < cc.length; ++j) {
+			if (cc[j].nodeType != 1) continue;
+			// cc[j] is 'c' element
+			var attrs = cc[j].attributes;
+			var cell = {};
+			var cr = _getColIndex(attrs.r.value);
+			if (attrs.s) cell.s = attrs.s.value;
+			if (attrs.t) cell.t = attrs.t.value;
+			
+			row[cr] = cell;
+			var cv = cc[j].childNodes;
+			for (var k = 0; k < cv.length; ++k) {
+				if (cv[k].nodeType != 1) continue;
+				cell[cv[k].nodeName] = cv[k].textContent;
+			}
+			if (cell.t && cell.t == 's' && cell.v) cell.v = ss[parseInt(cell.v)];
+		}
+		this._cells[r] = row;
+	}
+	// console.log(this._cells);
+}
+Sheet.prototype._initMergeCells = function(node) {
 	
+}
+Sheet.prototype._init = function() {
+	var child = this._docElem.childNodes;
+	for (var i = 0; i < child.length; ++i) {
+		if (child[i].nodeName == 'cols') {
+			this._initCols(child[i]);
+		} else if (child[i].nodeName == 'sheetData') {
+			this._initSheetData(child[i]);
+		} else if (child[i].nodeName == 'mergeCells') {
+			this._initMergeCells(child[i]);
+		} else if (child[i].nodeName == 'sheetFormatPr') {
+			// this._initSheetFormatPr(child[i]);
+		}
+	}
 }
 
 Workbook.prototype.getSheetNames = function() {
@@ -93,23 +174,45 @@ Workbook.prototype.getSheetNames = function() {
 	return ret;
 }
 
+Workbook.prototype._readSharedString = function(path) {
+	this._strings = [];
+	var docElem = _readLocalXml(path);
+	var child = docElem.childNodes;
+	for (var i = 0; i < child.length; ++i) {
+		if (child[i].nodeType == 1) {
+			var cc = child[i].childNodes;
+			for (var j = 0; j < cc.length; ++j) {
+				if (cc[j].nodeType == 1) {
+					this._strings.push(cc[j].textContent);
+					break;
+				}
+			}
+		}
+	}
+	// console.log(this._strings);
+}
+
+Workbook.prototype._readStyle = function() {
+}
+
 Workbook.prototype._readSheet = function(sh) {
 	if (! this._readySheets) {
 		var it = this._zip.findItem(this._partNames._sharedString);
-		var b = this._zip.unzipItem(it.index, _partNameToPath(this._destPath, this._partNames._sharedString));
+		var p = _partNameToPath(this._destPath, this._partNames._sharedString);
+		var b = this._zip.unzipItem(it.index, p);
+		this._readSharedString(p);
+		
 		it = this._zip.findItem(this._partNames._style);
-		b = this._zip.unzipItem(it.index, _partNameToPath(this._destPath, this._partNames._style));
+		p = _partNameToPath(this._destPath, this._partNames._style);
+		b = this._zip.unzipItem(it.index, p);
+		this._readStyle(p);
 		this._readySheets = true;
 	}
 	var p = _partNameToPath(this._destPath, sh.partName);
 	var it = this._zip.findItem(sh.partName);
 	this._zip.unzipItem(it.index, p);
 	
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("GET", p, false); // false: sync request
-	xmlhttp.send(null);
-	// console.log(xmlhttp.responseText);
-	return {txt: xmlhttp.responseText, xml: xmlhttp.responseXML};
+	return _readLocalXml2(p);
 }
 
 Workbook.prototype.getSheet = function(idxOrName) {
@@ -132,7 +235,7 @@ Workbook.prototype.getSheet = function(idxOrName) {
 		return sh._sheetObj;
 	}
 	var rs = this._readSheet(sh);
-	sh._sheetObj = new Sheet(rs.txt, rs.xml);
+	sh._sheetObj = new Sheet(this, rs.txt, rs.xml);
 	sh._sheetObj._init();
 	return sh._sheetObj;
 }
