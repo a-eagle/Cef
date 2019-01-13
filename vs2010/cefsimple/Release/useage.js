@@ -1,8 +1,8 @@
  参数： --disable-web-security 可以开启ajax加载本地文件
         --single-process  单进程运行模型
  注：html 里必须要指明charset <meta charset="UTF-8">   默认Cef用GBK加载
-
-Buffer createBuffer(int length);
+ 
+Buffer createBuffer(int length); // create a native buffer
 class Buffer {
 	int length();
 	void* buffer([int pos]);
@@ -64,16 +64,15 @@ what? callNative(String funcName, String funcDesc, Array funcParams);
 
 
 class ZIP {
-	constructor(zipFilePath);
-	// constructor(memorySize); // build  memory, not implement
+	constructor(String zipFilePath);
 	boolean create();
 	boolean open();
 	boolean close();
-	boolean add(itemName, filePath);
+	boolean add(String itemName, String filePath);
 	Object getItem(int idx);  // Object = {index: 2, name:'abc/tt.xml', compressSize:1200, unCompressSize:3000}
 	int getItemCount();
-	Object findItem(itemName);  // Object = {index: 2, name:'abc/tt.xml', compressSize:1200, unCompressSize:3000}
-	boolean unzipItem(idx, destFilePath);
+	Object findItem(String itemName);  // Object = {index: 2, name:'abc/tt.xml', compressSize:1200, unCompressSize:3000}
+	boolean unzipItem(int idx, String destFilePath);
 }
 
 class FILE {
@@ -84,9 +83,9 @@ class FILE {
 	int length();
 	Buffer read();
 	boolean write(String data or Buffer buf);
-	String[] list([pattern]); // pattern 匹配模式  如：*.txt
+	String[] list([String pattern]); // pattern 匹配模式  如：*.txt
 }
 
 
-	
+
 	

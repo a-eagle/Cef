@@ -1,3 +1,27 @@
+/**
+	class Office {
+		static Workbook readXLSX(String filePath);
+	}
+	
+	class Workbook {
+		String[] _strings;   // shared strings
+		Object[] _sheets;    // Object = {partName:'xl/workbook/sheet 1.xml', }
+		
+		String[] getSheetNames();
+		Sheet getSheet(int index);
+		Sheet getSheet(String sheetName);
+	}
+	
+	class Sheet {
+		// Object is {s:'1', t:'s', f:'SUM(A3,B12)', v:'xdd'}
+		// s: cell style id  , t: cell type 's' is shared string,   f: function ,  v: cell value
+		Object[][] _cells;
+		
+		String _txt; // full origin text
+	}
+
+*/
+
 function _readLocalXml(path) {
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.open("GET", path, false); // false: sync request
@@ -240,6 +264,11 @@ Workbook.prototype.getSheet = function(idxOrName) {
 	return sh._sheetObj;
 }
 
+
+function Word(zip, destPath) {
+	
+}
+
 var Office = {
 	_outPath : '',
 	
@@ -264,10 +293,19 @@ var Office = {
 	readXLSX : function(path) {
 		var f = new ZIP(path);
 		if (! f.open()) {
-			console.log('XLSX.read() error. File {' + path + '} is not a XLSX file');
+			console.log('Office.readXLSX() error. File {' + path + '} is not a XLSX file');
 			return false;
 		}
 		return new Workbook(f, this._getOutPath() + '\\' + (new Date().getTime()));
+	},
+	
+	readWord : function(path) {
+		var f = new ZIP(path);
+		if (! f.open()) {
+			console.log('Office.readWord() error. File {' + path + '} is not a XLSX file');
+			return false;
+		}
+		return new Word(f, this._getOutPath() + '\\' + (new Date().getTime()));
 	}
 };
 
