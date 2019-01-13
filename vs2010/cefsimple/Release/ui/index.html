@@ -16,6 +16,7 @@
 		// $('#base_table').datagrid('loadData', data);
 		
 		var wb = Office.readXLSX('PKA.xlsx');
+		console.log(wb.getSheetNames());
 		var sh = wb.getSheet('AAA');
 		console.log(sh);
 	});
