@@ -1,8 +1,9 @@
  参数： --disable-web-security 可以开启ajax加载本地文件
-        --single-process  单进程运行模型
+        --single-process  单进程运行模型，不会加载onWebkit..Init之类的函数,不建议使用
  注：html 里必须要指明charset <meta charset="UTF-8">   默认Cef用GBK加载
  
-Buffer createBuffer(int length); // create a native buffer
+// create a native buffer . If address is NULL, Buffer memory auto clear zero
+Buffer createBuffer(void * address, int length);
 class Buffer {
 	int length();
 	void* buffer([int pos]);

@@ -136,7 +136,6 @@ void ClientAppRenderer::OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefP
 
 	static CefRefPtr<CefV8Value> app = CefV8Value::CreateObject(NULL);
 	object->SetValue("App", app, V8_PROPERTY_ATTRIBUTE_NONE);
-
 }
 
 extern void RegisterZipCode();

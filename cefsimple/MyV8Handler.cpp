@@ -376,20 +376,31 @@ bool MyV8Handler::Execute( const CefString& name, CefRefPtr<CefV8Value> object,
 	}
 
 	if (name == "createBuffer") {
-		if (arguments.size() != 1 || !arguments[0]->IsInt()) {
+		if (arguments.size() == 0 || arguments.size() > 2) {
 			return false;
 		}
-		int v = arguments[0]->GetIntValue();
-		if (v <= 0 || v > 1024 * 1024 * 100) {
+		
+		if (! arguments[0]->IsInt())
 			return false;
+		void *buf = (void *)arguments[0]->GetIntValue();
+		int v = INT_MAX;
+		if (arguments.size() == 2 && arguments[1]->IsInt()) {
+			v = arguments[1]->GetIntValue();
 		}
-		void *buf = malloc(v);
-		if (buf == NULL) {
-			return false;
+		if (buf == NULL && v != INT_MAX) {
+			buf = malloc(v);
+			if (buf == NULL) {
+				return false;
+			}
+			memset(buf, 0, v);
+			retval = WrapBuffer(buf, v);
+			return true;
 		}
-		memset(buf, 0, v);
-		retval = WrapBuffer(buf, v);
-		return true;
+		if (buf != NULL) {
+			retval = WrapBuffer(buf, v);
+			return true;
+		}
+		return false;
 	}
 
 	return false;
