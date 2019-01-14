@@ -213,13 +213,15 @@ public:
 			if (arguments.size() == 1 && arguments[0]->IsString()) {
 				CefString cs = arguments[0]->GetStringValue();
 				if (cs == "gbk" || cs == "GBK" || cs == "gb2312" || cs == "GB2312") {
-					charset = 0;
+					charset = 2;
 				} else if (cs == "utf8" || cs == "UTF8" || cs == "utf-8" || cs == "UTF-8") {
 					charset = 1;
 				}
 			}
 			wchar_t *dd = NULL;
 			if (charset == 0) {
+				dd = (wchar_t *)wd->mBuf;
+			} else if (charset == 2) {
 				dd = XString::gbkToUnicode((char *)wd->mBuf);
 			} else {
 				dd = (wchar_t *)XString::toBytes(wd->mBuf, XString::UTF8, XString::UNICODE2);

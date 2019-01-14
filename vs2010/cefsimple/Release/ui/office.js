@@ -1,6 +1,7 @@
 /**
 	class Office {
 		static Workbook readXLSX(String filePath);
+		static Workbook readDOCX(String filePath);
 	}
 	
 	class Workbook {
@@ -292,10 +293,50 @@ Office.Workbook.prototype.getSheet = function(idxOrName) {
 
 
 Office.Word = function(zip, destPath) {
+	this._zip = zip;
+	this._destPath = destPath;
+	this._partNames = {}; // zip part names
+	this._partNames._documentRels = 'word/_rels/document.xml.rels';
 	
+	var FILE_NAME = '[Content_Types].xml';
+	var it = zip.findItem(FILE_NAME);
+	var b = zip.unzipItem(it.index, destPath + '\\' + FILE_NAME);
+	var docElem = Office._readLocalXml(destPath + '\\' + FILE_NAME);
+	var child = docElem.childNodes;
+	for (var i = 0; i < child.length; ++i) {
+		var ct = child[i].getAttribute('ContentType');
+		var pn = child[i].getAttribute('PartName');
+		if (pn && pn.charAt(0) == '/') {
+			pn = pn.substring(1);
+		}
+		if (ct.indexOf('document.main+xml') > 0) {
+			this._partNames._document = pn;
+		} else if (ct.indexOf('styles+xml') > 0) {
+			this._partNames._style = pn;
+		} else if (ct.indexOf('settings+xml') > 0) {
+			this._partNames._settings = pn;
+		}
+	}
+	
+	it = zip.findItem(this._partNames._document);
+	b = zip.unzipItem(it.index, Office._partNameToPath(destPath, this._partNames._document));
+	it = zip.findItem(this._partNames._workbookRels);
+	b = zip.unzipItem(it.index, Office._partNameToPath(destPath, this._partNames._workbookRels));
+	
+	docElem = Office._readLocalXml(Office._partNameToPath(destPath, this._partNames._workbook));
+	child = docElem.childNodes;
+	var sheets = [];
+	for (var i = 0; i < child.length; ++i) {
+		if (child[i].nodeName == 'sheets') {
+			var sc = child[i].childNodes;
+			for (var j = 0; j < sc.length; ++j) {
+				if (sc[j].nodeType != 1) continue;
+				sheets.push({name:sc[j].getAttribute('name'), rId:sc[j].getAttribute('r:id')});
+			}
+			break;
+		}
+	}
 }
-
-
 
 Office.readXLSX = function(path) {
 	var f = new ZIP(path);
@@ -306,7 +347,7 @@ Office.readXLSX = function(path) {
 	return new this.Workbook(f, this._getOutPath() + '\\' + (new Date().getTime()));
 }
 	
-Office.readWord = function(path) {
+Office.readDOCX = function(path) {
 	var f = new ZIP(path);
 	if (! f.open()) {
 		console.log('Office.readWord() error. File {' + path + '} is not a XLSX file');
