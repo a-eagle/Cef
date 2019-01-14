@@ -210,24 +210,28 @@ public:
 				return false;
 			}
 			int charset = 0;
-			if (arguments.size() == 1 && arguments[0]->IsString()) {
+			if (arguments.size() == 0) {
+				charset = 1;
+			} else if (arguments.size() == 1 && arguments[0]->IsString()) {
 				CefString cs = arguments[0]->GetStringValue();
 				if (cs == "gbk" || cs == "GBK" || cs == "gb2312" || cs == "GB2312") {
 					charset = 2;
 				} else if (cs == "utf8" || cs == "UTF8" || cs == "utf-8" || cs == "UTF-8") {
-					charset = 1;
+					charset = 3;
 				}
 			}
 			wchar_t *dd = NULL;
-			if (charset == 0) {
+			if (charset == 1) {
 				dd = (wchar_t *)wd->mBuf;
 			} else if (charset == 2) {
 				dd = XString::gbkToUnicode((char *)wd->mBuf);
-			} else {
+			} else if (charset == 3) {
 				dd = (wchar_t *)XString::toBytes(wd->mBuf, XString::UTF8, XString::UNICODE2);
+			} else {
+				return false;
 			}
 			retval = CefV8Value::CreateString(CefString(dd));
-			if (dd != NULL) free(dd);
+			if (dd != NULL && charset != 1) free(dd);
 			return true;
 		}
 
