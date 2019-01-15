@@ -122,24 +122,17 @@ void ClientAppRenderer::OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefP
 	printf("ClientAppRenderer.OnContextCreated() \n");
 	// Retrieve the context's window object.
 	CefRefPtr<CefV8Value> object = context->GetGlobal();
-
-	// Create the "openDBDriver" function.
-	CefRefPtr<CefV8Value> func1 = CefV8Value::CreateFunction("openDBDriver", m_v8Handler);
-	// Add the "openDBDriver" function to the "window" object.
-	object->SetValue("openDBDriver", func1, V8_PROPERTY_ATTRIBUTE_NONE);
 	
 	CefRefPtr<CefV8Value> func2 = CefV8Value::CreateFunction("callNative", m_v8Handler);
 	object->SetValue("callNative", func2, V8_PROPERTY_ATTRIBUTE_NONE);
 
-	CefRefPtr<CefV8Value> func3 = CefV8Value::CreateFunction("createBuffer", m_v8Handler);
-	object->SetValue("createBuffer", func3, V8_PROPERTY_ATTRIBUTE_NONE);
-
-	static CefRefPtr<CefV8Value> app = CefV8Value::CreateObject(NULL);
-	object->SetValue("App", app, V8_PROPERTY_ATTRIBUTE_NONE);
+	// static CefRefPtr<CefV8Value> app = CefV8Value::CreateObject(NULL);
+	// object->SetValue("App", app, V8_PROPERTY_ATTRIBUTE_NONE);
 }
 
 extern void RegisterZipCode();
 extern void RegisterFileCode();
+extern void RegisterV8Code();
 
 void ClientAppRenderer::OnWebKitInitialized()
 {
@@ -148,6 +141,7 @@ void ClientAppRenderer::OnWebKitInitialized()
 	
 	RegisterZipCode();
 	RegisterFileCode();
+	RegisterV8Code();
 }
 
 void ClientAppRenderer::OnUncaughtException( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context, CefRefPtr<CefV8Exception> exception, CefRefPtr<CefV8StackTrace> stackTrace )

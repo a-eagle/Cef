@@ -5,7 +5,7 @@ _db : null,
 	
 initDBDriver : function() {
 	if (! this._db) {
-		this._db = openDBDriver('mysql://localhost:3306/tdx_f10', 'root', 'root');
+		this._db = DBDriver.open('mysql://localhost:3306/tdx_f10', 'root', 'root');
 	}
 	return this._db;
 },

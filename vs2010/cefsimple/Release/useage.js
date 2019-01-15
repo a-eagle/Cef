@@ -2,9 +2,11 @@
         --single-process  单进程运行模型，不会加载onWebkit..Init之类的函数,不建议使用
  注：html 里必须要指明charset <meta charset="UTF-8">   默认Cef用GBK加载
  
-// create a native buffer . If address is NULL, Buffer memory auto clear zero
-Buffer createBuffer(void * address, int length);
-class Buffer {
+
+class NBuffer {
+	// create a native buffer . If address is NULL, Buffer memory auto malloc and clear zero
+	static NBuffer create(void * address, int length);
+	
 	int length();
 	void* buffer([int pos]);
 	void destory();
@@ -17,8 +19,9 @@ class Buffer {
 	String toString([String charset]);
 }
 
-DBDriver openDBDriver(String url, [String userName], [String password]);
 class DBDriver {
+	static DBDriver open(String url, [String userName], [String password]);
+	
 	void setAutoCommit(bool auto);
 	bool commit();
 	bool rollback();
@@ -76,7 +79,7 @@ class ZIP {
 	boolean unzipItem(int idx, String destFilePath);
 }
 
-class FILE {
+class NFile {
 	constructor(path);
 	String getName();
 	boolean exists();

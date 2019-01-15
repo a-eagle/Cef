@@ -333,8 +333,8 @@ bool MyV8Handler::Execute( const CefString& name, CefRefPtr<CefV8Value> object,
 {
 	static SqlConnection *sCon = NULL;
 	// OpenDBDriver(url, userName, password)
-	if (name == "openDBDriver") {
-		printf("MyV8Handler::Execute -> openDBDriver \n");
+	if (name == "DBDriver_open") {
+		printf("MyV8Handler::Execute -> DBDriver_open \n");
 		if (sCon != NULL && !sCon->isClosed()) {
 			retval = WrapDBDriver(sCon);
 			return true;
@@ -353,15 +353,15 @@ bool MyV8Handler::Execute( const CefString& name, CefRefPtr<CefV8Value> object,
 			char *userNameStr = (char *)XString::toBytes((void *)userName.c_str(), XString::UNICODE2, XString::GBK);
 			char *passwordStr = (char *)XString::toBytes((void *)password.c_str(), XString::UNICODE2, XString::GBK);
 			
-			printf("openDBDriver(%s, %s, %s) \n", urlStr, userNameStr, passwordStr);
+			printf("DBDriver_open(%s, %s, %s) \n", urlStr, userNameStr, passwordStr);
 
 			sCon = SqlConnection::open(urlStr, userNameStr, passwordStr);
 			if (sCon == NULL) {
-				printf("openDBDriver fail \n");
+				printf("DBDriver_open fail \n");
 				return false;
 			}
 			retval = WrapDBDriver(sCon);
-			printf("openDBDriver success \n");
+			printf("DBDriver_open success \n");
 			return true;
 		}
 		return false;
@@ -375,7 +375,7 @@ bool MyV8Handler::Execute( const CefString& name, CefRefPtr<CefV8Value> object,
 		return callNative(object, arguments, retval, exception);
 	}
 
-	if (name == "createBuffer") {
+	if (name == "NBuffer_create") {
 		if (arguments.size() == 0 || arguments.size() > 2) {
 			return false;
 		}
@@ -548,6 +548,17 @@ bool MyV8Handler::callNative(CefRefPtr<CefV8Value> object,
 	}
 	
 	return true;
+}
+
+void RegisterV8Code() {
+	std::string code = 
+		"function NBuffer() {};\n"
+		"NBuffer.create = function(addr, len) {native function NBuffer_create(addr, len); return NBuffer_create(addr, len);};\n"
+		"function DBDriver() {};\n"
+		"DBDriver.open = function(url, n, p) {native function DBDriver_open(url, n, p); return DBDriver_open(url, n, p);};\n"
+		;
+
+	CefRegisterExtension("v8/MyV8", code, new MyV8Handler());
 }
 
 // String readFile(String path, [String options]) options: base64 

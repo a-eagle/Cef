@@ -12,8 +12,8 @@
 
 <script type='text/javascript' >
 	$(function() {
-		// var data = DB.query("select * from _base limit 100");
-		// $('#base_table').datagrid('loadData', data);
+		var data = DB.query("select * from _base limit 100");
+		$('#base_table').datagrid('loadData', data);
 		
 		var wb = Office.readXLSX('PKA.xlsx');
 		console.log(wb.getSheetNames());

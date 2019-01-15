@@ -30,11 +30,11 @@ var Office = {
 		if (this._outPath) {
 			return this._outPath;
 		}
-		var buf = createBuffer(512);
+		var buf = NBuffer.create(0, 512);
 		var d = callNative('GetTempPathA', 'i(i,p)', [512, buf.buffer()]);
 		var p = buf.toString('GBK');
 		p += 'office.js';
-		var file = new FILE(p);
+		var file = new NFile(p);
 		if (! file.isDirectory()) {
 			var b = callNative('CreateDirectoryW', 'i(w, p)', [p, 0]);
 			if (b) this._outPath = p;

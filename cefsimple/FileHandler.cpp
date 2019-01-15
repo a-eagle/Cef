@@ -155,16 +155,16 @@ bool FileV8Handler::Execute( const CefString& name, CefRefPtr<CefV8Value> obj, c
 
 void RegisterFileCode() {
 	std::string zip_code = 
-		"function FILE(path) {"
+		"function NFile(path) {"
 		"	this._path = path.replace('/', '\\\\');"
 		"};"
-		"FILE.prototype.getName = function() {var idx = this._path.lastIndexOf('\\\\'); if (idx < 0) return this._path; return this._path.substring(idx + 1);};"
-		"FILE.prototype.exists = function() {native function FILE_exists(); return FILE_exists(this);};"
-		"FILE.prototype.isDirectory = function() {native function FILE_isDirectory(); return FILE_isDirectory(this);};"
-		"FILE.prototype.length = function() {native function FILE_length(); return FILE_length(this);};"
-		"FILE.prototype.read = function() {native function FILE_read(); return FILE_read(this);};"
-		"FILE.prototype.write = function(data) {native function FILE_write();return FILE_write(this, data);};"
-		"FILE.prototype.list = function(pattern) {native function FILE_list();return FILE_list(this, pattern);};"
+		"NFile.prototype.getName = function() {var idx = this._path.lastIndexOf('\\\\'); if (idx < 0) return this._path; return this._path.substring(idx + 1);};"
+		"NFile.prototype.exists = function() {native function FILE_exists(); return FILE_exists(this);};"
+		"NFile.prototype.isDirectory = function() {native function FILE_isDirectory(); return FILE_isDirectory(this);};"
+		"NFile.prototype.length = function() {native function FILE_length(); return FILE_length(this);};"
+		"NFile.prototype.read = function() {native function FILE_read(); return FILE_read(this);};"
+		"NFile.prototype.write = function(data) {native function FILE_write();return FILE_write(this, data);};"
+		"NFile.prototype.list = function(pattern) {native function FILE_list();return FILE_list(this, pattern);};"
 		"\n";
 
 	CefRegisterExtension("v8/LocalFile", zip_code, new FileV8Handler());
