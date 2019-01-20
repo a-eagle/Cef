@@ -62,11 +62,16 @@ class SimpleHandler : public CefClient,
                            ErrorCode errorCode,
                            const CefString& errorText,
                            const CefString& failedUrl) OVERRIDE;
+  virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser,
+	  CefRefPtr<CefFrame> frame,
+	  int httpStatusCode);
 
   // Request that all existing browser windows close.
   void CloseAllBrowsers(bool force_close);
 
   bool IsClosing() const { return is_closing_; }
+
+  CefString mInjectJsUrls;
 
  private:
   // Platform-specific implementation.
@@ -81,6 +86,7 @@ class SimpleHandler : public CefClient,
   BrowserList browser_list_;
 
   bool is_closing_;
+
 
   // Include the default reference counting implementation.
   IMPLEMENT_REFCOUNTING(SimpleHandler);

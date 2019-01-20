@@ -1,5 +1,7 @@
  参数： --disable-web-security 可以开启ajax加载本地文件
         --single-process  单进程运行模型，不会加载onWebkit..Init之类的函数,不建议使用
+		--inject='C:\a.js;D:\b.js' 注入javascript 多个js之间用分号分隔
+		
  注：html 里必须要指明charset <meta charset="UTF-8">   默认Cef用GBK加载
  
 

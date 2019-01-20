@@ -13,6 +13,7 @@
 #include "include/views/cef_window.h"
 #include "include/wrapper/cef_closure_task.h"
 #include "include/wrapper/cef_helpers.h"
+#include "utils/XString.h"
 
 namespace {
 
@@ -160,4 +161,38 @@ bool SimpleHandler::OnContextMenuCommand( CefRefPtr<CefBrowser> browser, CefRefP
 	}
 	// by default handling
 	return false;
+}
+
+void SimpleHandler::OnLoadEnd( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode )
+{
+	static char jsCode[512];
+	const wchar_t *jwss = mInjectJsUrls.c_str();
+	char *jss = (char *)XString::toBytes((void *)jwss, XString::UNICODE2, XString::GBK);
+
+	if (mInjectJsUrls.empty()) {
+		return;
+	}
+	char jsUrl[260];
+	int idx = 0;
+	do {
+		char *path = strchr(jss, ';');
+		if (path == NULL) {
+			strcpy(jsUrl, jss);
+			jss = NULL;
+		} else {
+			*path = 0;
+			strcpy(jsUrl, jss);
+			jss = path + 1;
+		}
+		
+		sprintf(jsCode, "var _inject_script_ = document.createElement('script');"
+					"_inject_script_.src = '%s'; document.body.appendChild(_inject_script_);"
+					  , jsUrl);
+		
+		const CefString js(jsCode);
+		frame->ExecuteJavaScript(js, frame->GetURL(), 0);
+		++idx;
+	} while (jss != NULL && *jss != 0);
+
+	free(jss);
 }

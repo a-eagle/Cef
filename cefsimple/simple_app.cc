@@ -89,7 +89,9 @@ void SimpleApp::OnContextInitialized() {
   if (url.empty()) {
 	  url = "file:///index.html";
   }
-  
+
+  handler->mInjectJsUrls = command_line->GetSwitchValue("inject");
+
   if (use_views) {
     // Create the BrowserView.
     CefRefPtr<CefBrowserView> browser_view = CefBrowserView::CreateBrowserView(
