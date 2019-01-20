@@ -70,9 +70,9 @@ what? callNative(String funcName, String funcDesc, Array funcParams);
 
 
 class ZIP {
-	constructor(String zipFilePath);
-	boolean create();
-	boolean open();
+	static ZIP create(String zipFilePath); // create a new zip file
+	static ZIP open(String zipFilePath);   // open an exists zip file
+	
 	boolean close();
 	boolean add(String itemName, String filePath);
 	Object getItem(int idx);  // Object = {index: 2, name:'abc/tt.xml', compressSize:1200, unCompressSize:3000}
@@ -83,6 +83,7 @@ class ZIP {
 
 class NFile {
 	constructor(path);
+	
 	String getName();
 	boolean exists();
 	boolean isDirectory();

@@ -339,8 +339,8 @@ Office.Word = function(zip, destPath) {
 }
 
 Office.readXLSX = function(path) {
-	var f = new ZIP(path);
-	if (! f.open()) {
+	var f = ZIP.open(path);
+	if (! f) {
 		console.log('Office.readXLSX() error. File {' + path + '} is not a XLSX file');
 		return false;
 	}
@@ -348,8 +348,8 @@ Office.readXLSX = function(path) {
 }
 	
 Office.readDOCX = function(path) {
-	var f = new ZIP(path);
-	if (! f.open()) {
+	var f = ZIP.open(path);
+	if (! f) {
 		console.log('Office.readWord() error. File {' + path + '} is not a XLSX file');
 		return false;
 	}
