@@ -10,15 +10,15 @@ class NBuffer {
 	static NBuffer create(void * address, int length);
 	
 	int length();
-	void* buffer([int pos]);
+	void* buffer([int pos = 0]);
 	void destory();
-	int getByte(int pos, [bool sign]);
-	int getShort(int pos, [bool sign]);
-	int getInt(int pos, [bool sign]);
+	int getByte(int pos, [bool sign = false]);
+	int getShort(int pos, [bool sign = false]);
+	int getInt(int pos, [bool sign = false]);
 	void setByte(int pos, byte val);
 	void setShort(int pos, short val);
 	void setInt(int pos, int val);
-	String toString([String charset]);
+	String toString([String charset = unicode]);
 }
 
 class DBDriver {
