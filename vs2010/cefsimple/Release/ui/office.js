@@ -15,7 +15,7 @@
 	
 	class Sheet {
 		// Object is {s:'1', t:'s', f:'SUM(A3,B12)', v:'xdd'}
-		// s: cell style id  , t: cell type 's' is shared string,   f: function ,  v: cell value
+		// s: cell style id  , t: cell type, 's' is shared string,   f: function ,  v: cell value
 		Object[][] _cells;
 		
 		String _txt; // full origin text

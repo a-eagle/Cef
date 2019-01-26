@@ -88,8 +88,8 @@ class NFile {
 	boolean exists();
 	boolean isDirectory();
 	int length();
-	Buffer read();
-	boolean write(String data or Buffer buf);
+	NBuffer read();
+	boolean write(String data or NBuffer buf);
 	String[] list([String pattern]); // pattern 匹配模式  如：*.txt
 }
 
