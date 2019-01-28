@@ -244,7 +244,7 @@ public:
 
 static const char * BufferV8Accessor_sNames[] = {
 	"length", "buffer", "getByte", "setByte", "getShort",
-	"setShort", "getInt", "setInt", "toString", "destroy"};
+	"setShort",  "getInt", "setInt", "toString", "destroy"};
 
 
 class BufferV8Accessor : public CefV8Accessor {
@@ -403,6 +403,20 @@ bool MyV8Handler::Execute( const CefString& name, CefRefPtr<CefV8Value> object,
 		return false;
 	}
 
+	if (name == "NBuffer_copy") {
+		if (arguments.size() != 3 || !arguments[0]->IsInt() || !arguments[1]->IsInt() || !arguments[2]->IsInt()) {
+			return false;
+		}
+		void *dst = (void *)arguments[0]->GetIntValue();
+		void *src = (void *)arguments[1]->GetIntValue();
+		int len = arguments[2]->GetIntValue();
+		if (dst == NULL || src == NULL || len <= 0) {
+			return false;
+		}
+		memcpy(dst, src, len);
+		return true;
+	}
+
 	return false;
 }
 
@@ -554,6 +568,7 @@ void RegisterV8Code() {
 	std::string code = 
 		"function NBuffer() {};\n"
 		"NBuffer.create = function(addr, len) {native function NBuffer_create(addr, len); return NBuffer_create(addr, len);};\n"
+		"NBuffer.copy = function(dest, src, len) {native function NBuffer_copy(); NBuffer_copy(dest, src, len);};\n"
 		"function DBDriver() {};\n"
 		"DBDriver.open = function(url, n, p) {native function DBDriver_open(url, n, p); return DBDriver_open(url, n, p);};\n"
 		;
