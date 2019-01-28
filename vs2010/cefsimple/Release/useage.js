@@ -8,6 +8,7 @@
 class NBuffer {
 	// create a native buffer . If address is NULL, Buffer memory auto malloc and clear zero
 	static NBuffer create(void * address, int length);
+	static void copy(void *dst, void *src, int length);
 	
 	int length();
 	void* buffer([int pos = 0]);
