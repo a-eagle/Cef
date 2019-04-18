@@ -90,7 +90,7 @@ public:
 		if (name == "getColumnCount" || name == "getColumnLabel" || name == "getColumnName" || 
 			name == "getColumnType") {
 
-			CefRefPtr<CefV8Handler> hd(s_metaV8);
+			static CefRefPtr<CefV8Handler> hd(s_metaV8);
 			retval = CefV8Value::CreateFunction(name, hd);
 			return true;
 		}
@@ -224,7 +224,7 @@ public:
 			name == "getFloat" || name == "getInt" || name == "getInt64" || 
 			name == "getString" || name == "next" || name == "close" || name == "getMetaData") {
 
-			CefRefPtr<CefV8Handler> hd(s_rsV8);
+			static CefRefPtr<CefV8Handler> hd(s_rsV8);
 			retval = CefV8Value::CreateFunction(name, hd);
 			return true;
 		}
@@ -339,8 +339,8 @@ public:
 		if (name == "executeQuery" || name == "executeUpdate" || name == "getMetaData" || 
 			name == "getParameterCount" || name == "setDouble" || name == "setInt" || 
 			name == "setString" || name == "getInsertId" || name == "close" ) {
-
-			retval = CefV8Value::CreateFunction(name, CefRefPtr<CefV8Handler>(s_psV8));
+				static CefRefPtr<CefV8Handler> hd = s_psV8; // fix bug, must use static
+			retval = CefV8Value::CreateFunction(name, hd);
 			return true;
 		}
 		return false;
