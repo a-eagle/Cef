@@ -334,6 +334,7 @@ bool MyV8Handler::Execute( const CefString& name, CefRefPtr<CefV8Value> object,
 	static SqlConnection *sCon = NULL;
 	// OpenDBDriver(url, userName, password)
 	if (name == "DBDriver_open") {
+		SqlConnection::setCharset(SqlConnection::Charset_UTF8);
 		printf("MyV8Handler::Execute -> DBDriver_open \n");
 		if (sCon != NULL && !sCon->isClosed()) {
 			retval = WrapDBDriver(sCon);

@@ -52,14 +52,14 @@ public:
 		if (name == "getColumnLabel" && arguments.size() == 1 && arguments[0]->IsInt()) {
 			int col = arguments[0]->GetIntValue();
 			char *c = rs->getColumnLabel(col);
-			wchar_t *wc = (wchar_t *)XString::toBytes((void *)c, XString::GBK, XString::UNICODE2);
+			wchar_t *wc = (wchar_t *)XString::toBytes((void *)c, XString::UTF8, XString::UNICODE2);
 			retval = CefV8Value::CreateString(CefString(wc));
 			return true;
 		}
 		if (name == "getColumnName" && arguments.size() == 1 && arguments[0]->IsInt()) {
 			int col = arguments[0]->GetIntValue();
 			char *c = rs->getColumnName(col);
-			wchar_t *wc = (wchar_t *)XString::toBytes((void *)c, XString::GBK, XString::UNICODE2);
+			wchar_t *wc = (wchar_t *)XString::toBytes((void *)c, XString::UTF8, XString::UNICODE2);
 			retval = CefV8Value::CreateString(CefString(wc));
 			return true;
 		}
@@ -146,7 +146,7 @@ public:
 		if (name == "findColumn" && arguments.size() == 1 && arguments[0]->IsString()) {
 			CefString v0 = arguments[0]->GetStringValue();
 			const wchar_t *s = v0.c_str();
-			char *sc = (char *)XString::toBytes((void *)s, XString::UNICODE2, XString::GBK);
+			char *sc = (char *)XString::toBytes((void *)s, XString::UNICODE2, XString::UTF8);
 			int c = rs->findColumn(sc);
 			retval = CefV8Value::CreateInt(c);
 			if (sc) free(sc);
@@ -181,7 +181,7 @@ public:
 		if (name == "getString" && arguments.size() == 1 && arguments[0]->IsInt()) {
 			int c = arguments[0]->GetIntValue();
 			char *s = rs->getString(c);
-			wchar_t *ws = (wchar_t *)XString::toBytes((void *)s, XString::GBK, XString::UNICODE2);
+			wchar_t *ws = (wchar_t *)XString::toBytes((void *)s, XString::UTF8, XString::UNICODE2);
 			retval = CefV8Value::CreateString(CefString(ws));
 			return true;
 		}
@@ -297,7 +297,7 @@ public:
 			if (arguments[0]->IsInt() && arguments[1]->IsString()) {
 				CefString v1 = arguments[1]->GetStringValue();
 				const wchar_t *s = v1.c_str();
-				char *sc = (char *)XString::toBytes((void *)s, XString::UNICODE2, XString::GBK);
+				char *sc = (char *)XString::toBytes((void *)s, XString::UNICODE2, XString::UTF8);
 				ps->setString(arguments[0]->GetIntValue(), sc);
 				return true;
 			}
@@ -434,7 +434,7 @@ public:
 		}
 		if (name == "getError") {
 			char *c = s_con->getError();
-			wchar_t *wc = (wchar_t *)XString::toBytes((void *)c, XString::GBK, XString::UNICODE2);
+			wchar_t *wc = (wchar_t *)XString::toBytes((void *)c, XString::UTF8, XString::UNICODE2);
 			retval = CefV8Value::CreateString(CefString(wc));
 			if (wc != NULL) free(wc);
 			return true;
@@ -443,7 +443,7 @@ public:
 			Statement *s = s_con->createStatement();
 			CefString v0 = arguments[0]->GetStringValue();
 			const wchar_t *sql = v0.c_str();
-			char *sqlc = (char *)XString::toBytes((void *)sql, XString::UNICODE2, XString::GBK);
+			char *sqlc = (char *)XString::toBytes((void *)sql, XString::UNICODE2, XString::UTF8);
 			ResultSet *rs = s->executeQuery(sqlc);
 			if (rs == NULL) {
 				return false;
@@ -455,7 +455,7 @@ public:
 			Statement *s = s_con->createStatement();
 			CefString v0 = arguments[0]->GetStringValue();
 			const wchar_t *sql = v0.c_str();
-			char *sqlc = (char *)XString::toBytes((void *)sql, XString::UNICODE2, XString::GBK);
+			char *sqlc = (char *)XString::toBytes((void *)sql, XString::UNICODE2, XString::UTF8);
 			int num = s->executeUpdate(sqlc);
 			retval = CefV8Value::CreateInt(num);
 			s->close();
@@ -465,7 +465,7 @@ public:
 		if (name == "prepare" && arguments.size() == 1 && arguments[0]->IsString()) {
 			CefString v0 = arguments[0]->GetStringValue();
 			const wchar_t *sql = v0.c_str();
-			char *sqlc = (char *)XString::toBytes((void *)sql, XString::UNICODE2, XString::GBK);
+			char *sqlc = (char *)XString::toBytes((void *)sql, XString::UNICODE2, XString::UTF8);
 			PreparedStatement *ps = s_con->prepareStatement(sqlc);
 			if (ps == NULL) {
 				return false;
