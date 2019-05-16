@@ -14,6 +14,7 @@ static SqlConnection *s_con;
 
 CefRefPtr<CefV8Value> WrapResultSet(ResultSet *rs, bool closeStament);
 CefRefPtr<CefV8Value> WrapResultSetMetaData(ResultSetMetaData *rs);
+extern CefRefPtr<CefV8Value> WrapBuffer(void *buf, int len);
 
 class Wrap : public CefBase {
 public:
@@ -153,7 +154,10 @@ public:
 			return true;
 		}
 		if (name == "getBlob") {
-			// TODO:
+			int c = arguments[0]->GetIntValue();
+			int len = 0;
+			void *blob = rs->getBlob(c, &len);
+			retval = WrapBuffer(blob, len);
 			return true;
 		}
 		if (name == "getBlobBase64") {
