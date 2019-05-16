@@ -92,6 +92,9 @@ class NFile {
 	NBuffer read();
 	boolean write(String data or NBuffer buf);
 	String[] list([String pattern]); // pattern 匹配模式  如：*.txt
+	boolean mkdirs();
+	boolean mkdir();
+	boolean remove(); // remove file or remove directory
 }
 
 

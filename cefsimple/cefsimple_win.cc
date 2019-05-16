@@ -56,6 +56,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
   // It will create the first browser instance in OnContextInitialized() after
   // CEF has initialized.
   CefRefPtr<CefApp> app;
+
   if (! command_line->HasSwitch("type")) {
 	  app = new SimpleApp();
   } else {
