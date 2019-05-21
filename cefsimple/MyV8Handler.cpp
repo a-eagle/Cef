@@ -204,6 +204,36 @@ public:
 			return true;
 		}
 
+		// void setString(int pos, String val)
+		if (name == "setString") {
+			if (wd->mBuf == NULL || arguments.size() != 2) {
+				return false;
+			}
+			if (!arguments[0]->IsInt() && !arguments[1]->IsString()) {
+				return false;
+			}
+			int x = arguments[0]->GetIntValue();
+			CefString v = arguments[1]->GetStringValue();
+			if (x < 0 || x >= wd->mLen) {
+				return false;
+			}
+			const wchar_t *wv = v.c_str();
+			if (wv == NULL) {
+				return false;
+			}
+			char *b = (char *)wd->mBuf + x;
+			int mlen = x + wcslen(wv) * 2 + 2;
+			if (mlen < wd->mLen) {
+				wcscpy((wchar_t *)b, wv);
+			} else {
+				int elen = wd->mLen - x - 2;
+				memcpy(b, wv, elen);
+				char * p = (char *)wd->mBuf + wd->mLen - 2;
+				p[0] = p[1] = 0;
+			}
+			return true;
+		}
+
 		// String toString([String charset])
 		if (name == "toString") {
 			if (wd->mBuf == NULL) {
@@ -244,7 +274,7 @@ public:
 
 static const char * BufferV8Accessor_sNames[] = {
 	"length", "buffer", "getByte", "setByte", "getShort",
-	"setShort",  "getInt", "setInt", "toString", "destroy"};
+	"setShort",  "getInt", "setInt", "setString", "toString", "destroy"};
 
 
 class BufferV8Accessor : public CefV8Accessor {

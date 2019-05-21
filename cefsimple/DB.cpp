@@ -189,6 +189,13 @@ public:
 			retval = CefV8Value::CreateString(CefString(ws));
 			return true;
 		}
+		if (name == "getGbkString" && arguments.size() == 1 && arguments[0]->IsInt()) {
+			int c = arguments[0]->GetIntValue();
+			char *s = rs->getString(c);
+			wchar_t *ws = (wchar_t *)XString::toBytes((void *)s, XString::GBK, XString::UNICODE2);
+			retval = CefV8Value::CreateString(CefString(ws));
+			return true;
+		}
 		if (name == "next") {
 			bool b = rs->next();
 			retval = CefV8Value::CreateBool(b);
@@ -225,7 +232,7 @@ public:
 		CefString& exception) OVERRIDE {
 
 		if (name == "findColumn" || name == "getBlob" || name == "getBlobBase64" || name == "getDouble" || 
-			name == "getFloat" || name == "getInt" || name == "getInt64" || 
+			name == "getFloat" || name == "getInt" || name == "getInt64" || name == "getGbkString" ||
 			name == "getString" || name == "next" || name == "close" || name == "getMetaData") {
 
 			static CefRefPtr<CefV8Handler> hd(s_rsV8);
@@ -379,6 +386,7 @@ CefRefPtr<CefV8Value> WrapResultSet(ResultSet *rs, bool closeStament) {
 	obj->SetValue("getInt", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
 	obj->SetValue("getInt64", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
 	obj->SetValue("getString", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
+	obj->SetValue("getGbkString", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
 	obj->SetValue("next", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
 	obj->SetValue("close", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
 	obj->SetValue("getMetaData", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);

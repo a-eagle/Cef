@@ -19,6 +19,7 @@ class NBuffer {
 	void setByte(int pos, byte val);
 	void setShort(int pos, short val);
 	void setInt(int pos, int val);
+	void setString(int pos, String val);
 	String toString([String charset = unicode]);
 }
 
@@ -61,6 +62,7 @@ class ResultSet {
 	int getInt(int idx);
 	int getInt64(int idx);
 	String getString(int idx);
+	String getGbkString(int idx);
 	boolean next();
 	void close();
 	ResultSetMetaData getMetaData();
