@@ -135,6 +135,7 @@ void ClientAppRenderer::OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefP
 extern void RegisterZipCode();
 extern void RegisterFileCode();
 extern void RegisterV8Code();
+extern void RegisterThreadCode();
 
 void ClientAppRenderer::OnWebKitInitialized()
 {
@@ -144,6 +145,7 @@ void ClientAppRenderer::OnWebKitInitialized()
 	RegisterZipCode();
 	RegisterFileCode();
 	RegisterV8Code();
+	RegisterThreadCode();
 }
 
 void ClientAppRenderer::OnUncaughtException( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context, CefRefPtr<CefV8Exception> exception, CefRefPtr<CefV8StackTrace> stackTrace )
