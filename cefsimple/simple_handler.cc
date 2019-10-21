@@ -186,7 +186,8 @@ void SimpleHandler::OnLoadEnd( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame
 		}
 		
 		sprintf(jsCode, "var _inject_script_ = document.createElement('script');"
-					"_inject_script_.src = '%s'; document.body.appendChild(_inject_script_);"
+			"_inject_script_.src = '%s'; document.head.appendChild(_inject_script_);"
+			//"_inject_script_.src = '%s'; document.head.insertBefore(_inject_script_, document.head.childNodes[0]);"
 					  , jsUrl);
 		
 		const CefString js(jsCode);

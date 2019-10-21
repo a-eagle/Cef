@@ -6,7 +6,7 @@
 
 #include "cefsimple/simple_app.h"
 #include "include/cef_sandbox_win.h"
-
+#include <objbase.h>
 
 // When generating projects with CMake the CEF_USE_SANDBOX value will be defined
 // automatically if using the required compiler version. Pass -DUSE_SANDBOX=OFF
@@ -28,6 +28,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
                       int       nCmdShow) {
   UNREFERENCED_PARAMETER(hPrevInstance);
   UNREFERENCED_PARAMETER(lpCmdLine);
+  CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 #if 0
   AllocConsole();
@@ -93,6 +94,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 
   // Shut down CEF.
   CefShutdown();
-
+  CoUninitialize();
   return 0;
 }
