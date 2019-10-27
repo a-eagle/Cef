@@ -14,6 +14,7 @@
 #include "include/wrapper/cef_closure_task.h"
 #include "include/wrapper/cef_helpers.h"
 #include "utils/XString.h"
+#include "ResponseFilter.h"
 
 namespace {
 
@@ -133,10 +134,20 @@ void SimpleHandler::CloseAllBrowsers(bool force_close) {
     (*it)->GetHost()->CloseBrowser(force_close);
 }
 
+
+
+CefRefPtr<CefResponseFilter> SimpleHandler::GetResourceResponseFilter( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response ) {
+	CefRefPtr<CefResponseFilter> filter(new ResponseFilter(browser, frame, request, response));
+	return filter;
+}
+
 void SimpleHandler::OnBeforeContextMenu( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model )
 {
+	const int SHOW_INSPECT_ID = 26502;
 	const int SHOW_TOOLS_ID = 26505;
+
 	model->AddItem(SHOW_TOOLS_ID, "Show DevTools");
+	model->AddItem(SHOW_INSPECT_ID, "Inspect Element");
 }
 
 class DevToolsClient : public CefClient {
@@ -146,6 +157,7 @@ public:
 
 bool SimpleHandler::OnContextMenuCommand( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, int command_id, EventFlags event_flags )
 {
+	const int SHOW_INSPECT_ID = 26502;
 	const int SHOW_TOOLS_ID = 26505;
 
 	if (command_id == SHOW_TOOLS_ID) {
@@ -159,6 +171,19 @@ bool SimpleHandler::OnContextMenuCommand( CefRefPtr<CefBrowser> browser, CefRefP
 			inspect_element_at);
 		return true;
 	}
+
+	if (command_id == SHOW_INSPECT_ID) {
+		CefWindowInfo windowInfo;
+		CefRefPtr<CefClient> client = new DevToolsClient(); // 必须要有一个client，否则无法显示
+		CefBrowserSettings settings;
+		CefPoint inspect_element_at(params->GetXCoord(), params->GetYCoord());
+
+		windowInfo.SetAsPopup(NULL, "MY-DevTools");
+		browser->GetHost()->ShowDevTools(windowInfo, client, settings,
+			inspect_element_at);
+		return true;
+	}
+
 	// by default handling
 	return false;
 }

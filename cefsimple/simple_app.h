@@ -23,6 +23,10 @@ class SimpleApp : public CefApp,
   // CefBrowserProcessHandler methods:
   virtual void OnContextInitialized() OVERRIDE;
 
+  virtual void OnBeforeCommandLineProcessing(
+	  const CefString& process_type,
+	  CefRefPtr<CefCommandLine> command_line);
+
  private:
   // Include the default reference counting implementation.
   IMPLEMENT_REFCOUNTING(SimpleApp);
@@ -48,6 +52,10 @@ public:
 		CefRefPtr<CefV8Context> context,
 		CefRefPtr<CefV8Exception> exception,
 		CefRefPtr<CefV8StackTrace> stackTrace);
+
+	virtual void OnBeforeCommandLineProcessing(
+		const CefString& process_type,
+		CefRefPtr<CefCommandLine> command_line);
 
 private:
 	CefRefPtr<MyV8Handler> m_v8Handler;

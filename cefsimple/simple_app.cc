@@ -115,6 +115,22 @@ void SimpleApp::OnContextInitialized() {
   }
 }
 
+static void adjustCommandLine(CefRefPtr<CefCommandLine> command_line) {
+	command_line->AppendSwitch(L"disable-web-security");
+	command_line->AppendSwitchWithValue(L"remote_debugging_port ", L"8085");
+	// command_line->AppendSwitch(L"persist_session_cookies");
+	command_line->AppendSwitch(L"ignore-certificate-errors");
+	command_line->AppendSwitch(L"allow-external-pages");
+	command_line->AppendSwitch(L"allow-file-access-from-files");
+	command_line->AppendSwitch(L"allow-http-background-page");
+	command_line->AppendSwitch(L"allow-outdated-plugins");
+	command_line->AppendSwitch(L"allow-running-insecure-content");
+}
+
+void SimpleApp::OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line ) {
+	adjustCommandLine(command_line);
+}
+
 ClientAppRenderer::ClientAppRenderer() {
 	m_v8Handler = new MyV8Handler();
 }
@@ -175,5 +191,8 @@ void ClientAppRenderer::OnUncaughtException( CefRefPtr<CefBrowser> browser, CefR
 	free(src);
 }
 
+void ClientAppRenderer::OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line ) {
+	adjustCommandLine(command_line);
+}
 
 

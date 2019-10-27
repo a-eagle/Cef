@@ -6,6 +6,7 @@
 
 #include "cefsimple/simple_app.h"
 #include "include/cef_sandbox_win.h"
+#include "ResponseFilter.h"
 #include <objbase.h>
 
 // When generating projects with CMake the CEF_USE_SANDBOX value will be defined
@@ -52,6 +53,11 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 
   CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
   command_line->InitFromString(::GetCommandLineW());
+
+  if (command_line->HasSwitch("filter_response")) {
+	  CefString fr = command_line->GetSwitchValue("filter_response");
+	  ResponseFilter::initArgs(fr);
+  }
 
   // SimpleApp implements application-level callbacks for the browser process.
   // It will create the first browser instance in OnContextInitialized() after

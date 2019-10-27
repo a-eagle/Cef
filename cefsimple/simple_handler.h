@@ -13,7 +13,8 @@ class SimpleHandler : public CefClient,
                       public CefDisplayHandler,
                       public CefLifeSpanHandler,
                       public CefLoadHandler,
-					  public CefContextMenuHandler {
+					  public CefContextMenuHandler,
+					  public CefRequestHandler {
  public:
   explicit SimpleHandler(bool use_views);
   ~SimpleHandler();
@@ -33,6 +34,10 @@ class SimpleHandler : public CefClient,
   }
 
   virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() {
+	  return this;
+  }
+
+  virtual CefRefPtr<CefRequestHandler> GetRequestHandler() {
 	  return this;
   }
 
@@ -70,6 +75,13 @@ class SimpleHandler : public CefClient,
   void CloseAllBrowsers(bool force_close);
 
   bool IsClosing() const { return is_closing_; }
+
+  // CefRequestHandler
+  virtual CefRefPtr<CefResponseFilter> GetResourceResponseFilter(
+	  CefRefPtr<CefBrowser> browser,
+	  CefRefPtr<CefFrame> frame,
+	  CefRefPtr<CefRequest> request,
+	  CefRefPtr<CefResponse> response);
 
   CefString mInjectJsUrls;
 
