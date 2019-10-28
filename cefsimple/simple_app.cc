@@ -13,7 +13,6 @@
 #include "include/views/cef_window.h"
 #include "include/wrapper/cef_helpers.h"
 
-#include "DB.h"
 #include "utils/XString.h"
 
 namespace {
@@ -132,8 +131,9 @@ void SimpleApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 }
 
 ClientAppRenderer::ClientAppRenderer() {
-	m_v8Handler = new MyV8Handler();
 }
+
+extern CefRefPtr<CefV8Value> CreateCallNativeFunction();
 
 void ClientAppRenderer::OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context )
 {
@@ -141,27 +141,25 @@ void ClientAppRenderer::OnContextCreated( CefRefPtr<CefBrowser> browser, CefRefP
 	// Retrieve the context's window object.
 	CefRefPtr<CefV8Value> object = context->GetGlobal();
 	
-	CefRefPtr<CefV8Value> func2 = CefV8Value::CreateFunction("callNative", m_v8Handler);
+	CefRefPtr<CefV8Value> func2 = CreateCallNativeFunction();
 	object->SetValue("callNative", func2, V8_PROPERTY_ATTRIBUTE_NONE);
-
-	// static CefRefPtr<CefV8Value> app = CefV8Value::CreateObject(NULL);
-	// object->SetValue("App", app, V8_PROPERTY_ATTRIBUTE_NONE);
 }
 
 extern void RegisterZipCode();
 extern void RegisterFileCode();
-extern void RegisterV8Code();
+extern void RegisterBufferCode();
 extern void RegisterComCode();
+extern void RegisterDBCode();
 
 void ClientAppRenderer::OnWebKitInitialized()
 {
 	printf("ClientAppRenderer.OnWebKitInitialized() \n");
 
-	
 	RegisterZipCode();
 	RegisterFileCode();
-	RegisterV8Code();
+	RegisterBufferCode();
 	RegisterComCode();
+	RegisterDBCode();
 }
 
 void ClientAppRenderer::OnUncaughtException( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context, CefRefPtr<CefV8Exception> exception, CefRefPtr<CefV8StackTrace> stackTrace )

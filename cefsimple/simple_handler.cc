@@ -14,7 +14,7 @@
 #include "include/wrapper/cef_closure_task.h"
 #include "include/wrapper/cef_helpers.h"
 #include "utils/XString.h"
-#include "ResponseFilter.h"
+#include "extension/ResponseFilter.h"
 
 namespace {
 

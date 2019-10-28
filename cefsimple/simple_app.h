@@ -8,7 +8,6 @@
 #include "include/cef_app.h"
 #include "include/cef_client.h"
 #include "include/cef_v8.h"
-#include "MyV8Handler.h"
 
 // Implement application-level callbacks for the browser process.
 class SimpleApp : public CefApp,
@@ -58,7 +57,6 @@ public:
 		CefRefPtr<CefCommandLine> command_line);
 
 private:
-	CefRefPtr<MyV8Handler> m_v8Handler;
 
 	IMPLEMENT_REFCOUNTING(ClientAppRenderer);
 };

@@ -99,6 +99,10 @@ class NFile {
 	boolean remove(); // remove file or remove directory
 }
 
+class ActiveXObject2 {
+	constructor(clsid or progId);
+}
+
 
 
 	

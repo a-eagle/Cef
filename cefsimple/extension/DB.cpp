@@ -1,5 +1,6 @@
-#include "DB.h"
+#include "include/cef_v8.h"
 #include "utils/XString.h"
+#include "db/SqlDriver.h"
 
 class DBDriverV8Handler;
 class RestltSetV8Handler;
@@ -15,6 +16,7 @@ static SqlConnection *s_con;
 CefRefPtr<CefV8Value> WrapResultSet(ResultSet *rs, bool closeStament);
 CefRefPtr<CefV8Value> WrapResultSetMetaData(ResultSetMetaData *rs);
 extern CefRefPtr<CefV8Value> WrapBuffer(void *buf, int len);
+CefRefPtr<CefV8Value> WrapDBDriver(SqlConnection *con);
 
 class Wrap : public CefBase {
 public:
@@ -418,11 +420,45 @@ public:
 	DBDriverV8Handler() {
 	}
 
-	virtual bool Execute(const CefString& name,
-		CefRefPtr<CefV8Value> object,
-		const CefV8ValueList& arguments,
-		CefRefPtr<CefV8Value>& retval,
-		CefString& exception) OVERRIDE {
+	virtual bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) OVERRIDE {
+		static SqlConnection *sCon = NULL;
+		// OpenDBDriver(url, userName, password)
+		if (name == "DBDriver_open") {
+			if (sCon != NULL && !sCon->isClosed()) {
+				retval = WrapDBDriver(sCon);
+				return true;
+			}
+			if (arguments.size() >= 1) {
+				CefString url = arguments[0]->GetStringValue();
+
+				CefString userName, password;
+				if (arguments.size() >= 2) {
+					userName = arguments[1]->GetStringValue();
+				}
+				if (arguments.size() >= 3) {
+					password = arguments[2]->GetStringValue();
+				}
+				char *urlStr = (char *)XString::toBytes((void *)url.c_str(), XString::UNICODE2, XString::GBK);
+				char *userNameStr = (char *)XString::toBytes((void *)userName.c_str(), XString::UNICODE2, XString::GBK);
+				char *passwordStr = (char *)XString::toBytes((void *)password.c_str(), XString::UNICODE2, XString::GBK);
+
+				sCon = SqlConnection::open(urlStr, userNameStr, passwordStr);
+
+				if (urlStr) free(urlStr);
+				if (userNameStr) free(userNameStr);
+				if (passwordStr) free(passwordStr);
+
+				if (sCon == NULL) {
+					printf("DBDriver_open fail \n");
+					return false;
+				}
+				retval = WrapDBDriver(sCon);
+				printf("DBDriver_open success \n");
+				return true;
+			}
+			return false;
+		}
+
 		if (name == "getAutoCommit") {
 			retval = CefV8Value::CreateBool(s_con->getAutoCommit());
 			return true;
@@ -525,26 +561,9 @@ public:
 	IMPLEMENT_REFCOUNTING(DBDriverV8Accessor);
 };
 
-std::string GetDbExtention() {
-
-	std::string ext = "var app;"
-		"if (!app)"
-		"    app = {};"
-		"(function() {"
-		"    app.GetId = function(a, b) {"
-		"        native function GetMId(a, b);"
-		"        return GetMId(a, b);"
-		"    };"
-		"})();";
-
-	return ext;
-}
 
 CefRefPtr<CefV8Value> WrapDBDriver(SqlConnection *con) {
 	s_con = con;
-	if (s_dbV8 == NULL) {
-		s_dbV8 = new DBDriverV8Handler();
-	}
 	CefRefPtr<CefV8Accessor> accessor = new DBDriverV8Accessor();
 	CefRefPtr<CefV8Value> obj = CefV8Value::CreateObject(accessor);
 	obj->SetValue("setAutoCommit", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
@@ -556,4 +575,15 @@ CefRefPtr<CefV8Value> WrapDBDriver(SqlConnection *con) {
 	obj->SetValue("executeUpdate", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
 	obj->SetValue("prepare", V8_ACCESS_CONTROL_DEFAULT, V8_PROPERTY_ATTRIBUTE_NONE);
 	return obj;
+}
+
+void RegisterDBCode() {
+	std::string db_code = 
+		"function DBDriver() {};\n"
+		"DBDriver.open = function(url, n, p) {native function DBDriver_open(url, n, p); return DBDriver_open(url, n, p);};\n"
+		"\n";
+
+	s_dbV8 = new DBDriverV8Handler();
+	s_dbV8->AddRef();
+	CefRegisterExtension("v8/DB", db_code, s_dbV8);
 }

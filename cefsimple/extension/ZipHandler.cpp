@@ -1,7 +1,7 @@
 #include "include/cef_v8.h"
 #include <string>
-#include "zip.h"
-#include "unzip.h"
+#include "zip/zip.h"
+#include "zip/unzip.h"
 
 class ZipV8Handler : public CefV8Handler {
 public:
@@ -156,6 +156,7 @@ void RegisterZipCode() {
 		"	return null;"
 		"};\n"
 		"";
-	
-	CefRegisterExtension("v8/ZIP", zip_code, new ZipV8Handler());
+	ZipV8Handler *z = new ZipV8Handler();
+	z->AddRef();
+	CefRegisterExtension("v8/ZIP", zip_code, z);
 }

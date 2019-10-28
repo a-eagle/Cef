@@ -163,6 +163,7 @@ static bool FILE_mkdirs(const wchar_t *wpath) {
 			return false;
 		}
 	}
+	return false;
 }
 
 static bool FILE_mkdir(const wchar_t *wpath) {

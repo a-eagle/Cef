@@ -6,7 +6,7 @@
 
 #include "cefsimple/simple_app.h"
 #include "include/cef_sandbox_win.h"
-#include "ResponseFilter.h"
+#include "extension/ResponseFilter.h"
 #include <objbase.h>
 
 // When generating projects with CMake the CEF_USE_SANDBOX value will be defined
