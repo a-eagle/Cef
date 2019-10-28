@@ -56,7 +56,7 @@ class ResultSetMetaData {
 
 class ResultSet {
 	int findColumn(String colName);
-	getBlob(); // TODO:
+	NBuffer getBlob(int idx);
 	double getDouble(int idx);
 	float getFloat(int idx);
 	int getInt(int idx);
