@@ -137,8 +137,11 @@ void SimpleHandler::CloseAllBrowsers(bool force_close) {
 
 
 CefRefPtr<CefResponseFilter> SimpleHandler::GetResourceResponseFilter( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response ) {
-	CefRefPtr<CefResponseFilter> filter(new ResponseFilter(browser, frame, request, response));
-	return filter;
+	if (ResponseFilter::enableFilter()) {
+		CefRefPtr<CefResponseFilter> filter(new ResponseFilter(browser, frame, request, response));
+		return filter;
+	}
+	return NULL;
 }
 
 void SimpleHandler::OnBeforeContextMenu( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model )

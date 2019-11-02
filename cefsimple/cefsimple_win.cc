@@ -54,8 +54,8 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
   CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
   command_line->InitFromString(::GetCommandLineW());
 
-  if (command_line->HasSwitch("filter_response")) {
-	  CefString fr = command_line->GetSwitchValue("filter_response");
+  if (command_line->HasSwitch("filter-response")) {
+	  CefString fr = command_line->GetSwitchValue("filter-response");
 	  ResponseFilter::initArgs(fr);
   }
 

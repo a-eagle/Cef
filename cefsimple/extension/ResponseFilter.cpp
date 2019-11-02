@@ -34,7 +34,7 @@ CefResponseFilter::FilterStatus ResponseFilter::Filter( void* data_in, size_t da
 	*/
 
 	bool done = false;
-	if (mFilterAddr != NULL) {
+	if (mFilterAddr != NULL && data_in_size > 0) {
 		FilterResponse_t t = (FilterResponse_t)mFilterAddr;
 		done = t(mUrl.c_str(), data_in, data_in_size, data_in_read, data_out, data_out_size, data_out_written);
 	} 
@@ -62,4 +62,8 @@ void ResponseFilter::initArgs( CefString &args ) {
 		return;
 	}
 	mFilterAddr = addr;
+}
+
+bool ResponseFilter::enableFilter() {
+	return mFilterAddr != NULL;
 }

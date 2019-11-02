@@ -18,6 +18,7 @@ public:
 		size_t& data_out_written);
 
 	static void initArgs(CefString &args);
+	static bool enableFilter();
 protected:
 	static CefString mArgs;
 	static void *mFilterAddr;
