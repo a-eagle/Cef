@@ -16,3 +16,11 @@ log
 
 *.log
 *.lnk
+
+!/FilterResponse
+/FilterResponse/Release
+/FilterResponse/*.vcxpro*
+!/vs2010/Release/
+/vs2010/Release/*.pdb
+/vs2010/Release/*.exp
+/vs2010/Release/*.lib

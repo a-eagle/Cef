@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<document>
+	<config console="false" />
+	<item url="www.baidu.com/$" from="APP" to="" type="string">
+		Do It Dome
+	</item>
+	<item url="www.baidu.com/$" from="hao123" to="" type="script">
+		<![CDATA[
+			length len $from
+			set -n i = 0
+			set -s result = "HA    " $from ",len=" $len
+		]]>
+	</item>
+
+	<item url="www.mm131.net" from="14005250" to="" type="string">
+		Love In Spring
+	</item>
+</document>
